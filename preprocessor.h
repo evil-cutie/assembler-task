@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "tables.h"
 #define MAX 81
 
 enum boolean {FALSE, TRUE} newMacro;

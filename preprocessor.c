@@ -1,34 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#define MAX 81
+#include "preprocessor.h"
 
-enum boolean {FALSE, TRUE} newMacro;
-typedef struct macroLS * macroPT;
-typedef struct macroLS {
-	char *name;
-	char *line;
-	macroPT next;
-} macroLS;
-/******************************************* functions *******************************************/
-void readAndCreateFile(char *fname, macroPT *head);
-void addMacro(macroPT *head, char *name, char *string);
-macroPT findMacro(macroPT head, char *name);
-void printList(macroPT head);
-void freeList(macroPT *head);
-/*************************************************************************************************/
-int main(int argc, char *argv[])
-{	
-	int i;
-	for (i = 1; i < argc; i++)
-	{	
-		macroPT head = NULL;
-		readAndCreateFile(argv[i], &head);
-		/* printList(head); */
-		freeList(&head);
-	}
-}
 /* read .as file and create .am file with macro expansion */
 void readAndCreateFile(char *fname, macroPT *head)
 {
@@ -39,6 +10,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 	char fnameAm[MAX], fnameAs[MAX], buffer[MAX];
 	int i = 1;
 	value = name = textptr = firstWord = NULL;
+	newMacro = FALSE;
 	strcpy(fnameAm, fname);
 	strcpy(fnameAs, fname);
 	strncat(fnameAm, ".am", 3);
@@ -54,7 +26,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 	textptr = (char*)malloc(sizeof(char)*MAX);
 	firstWord = (char*)malloc(sizeof(char)*MAX);
 	name = (char*)malloc(sizeof(char)*MAX);
-	newMacro = FALSE;
+	
 	while(fgets(buffer, MAX, fpSource))
 	{	
 		sscanf(buffer, "%s", firstWord); /* scan a first word in a line */
@@ -91,7 +63,6 @@ void readAndCreateFile(char *fname, macroPT *head)
 		}
 		if(!newMacro)
 			fputs(buffer, fpAm); /* copy a line of code which is not macro definition to .am file */
-			printf("buffer: %s\n", buffer);
 	}
 	fclose(fpSource);
 	fclose(fpAm);
