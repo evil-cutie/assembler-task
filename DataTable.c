@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #define MAX 81
 
 enum flag {OFF =0,ON =1};
-enum flag commentFlag =OFF;
 
 typedef struct nodeData *dataPT;
 typedef struct nodeData
@@ -15,26 +15,37 @@ typedef struct nodeData
 }nodeData;
 /******************************************* functions *******************************************/
 char * readNextCommand(FILE *);
-void skipComments(char *,FILE *);
+int skip2command(char *,FILE *);
 /*************************************************************************************************/
 char * readNextCommand(FILE *fpAm)
 {
     static char buffer[MAX];
     if(fgets(buffer, MAX, fpAm))
     {
-        skipComments(buffer,fpAm);
-        return buffer;
+        if(skip2command(buffer,fpAm))
+            return buffer;
     }
     return NULL;
 }
 
-void skipComments(char *buffer,FILE *fpAm)
+int skip2command(char *buffer,FILE *fpAm)
 {
-    if (strstr(buffer, "/*") || strstr(buffer, "*/")) {
-        commentFlag = ON;
-        while (fgets(buffer, MAX, fpAm) && commentFlag == ON) {
-            if (strstr(buffer, "*/"))
+    enum flag commentFlag =ON;
+    int i;
+    while (commentFlag == ON) {
+        for (i = 0; i < MAX; i++) {         /*check if line is blank (whitespaces only)*/
+            if (buffer[i] == '\n')
+                break;
+            if (!isspace(buffer[i])) {
                 commentFlag = OFF;
+                break;
+            }
         }
+        if (strstr(buffer, ";"))            /*check if a comment*/
+            commentFlag = ON;
+        if (commentFlag == OFF)
+            return 1;
+        if (!fgets(buffer, MAX, fpAm))
+            return 0;
     }
 }
