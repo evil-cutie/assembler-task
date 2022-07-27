@@ -1,4 +1,5 @@
 #include "preprocessor.h"
+#include "tables.h"
 
 /* read .as file and create .am file with macro expansion */
 void readAndCreateFile(char *fname, macroPT *head)
@@ -60,6 +61,11 @@ void readAndCreateFile(char *fname, macroPT *head)
 			textptr = buffer;
 			textptr = textptr + strlen("macro"); /* move a pointer to the next word */
 			sscanf(textptr, "%s", name); /* scan next word */
+			if(isCommandName(name) || isDirName(name) || isRegisterName(name))
+			{
+				printf("\nError: macro name cannot be '%s'\n", name);
+				newMacro = FALSE;
+			}
 		}
 		if(!newMacro)
 			fputs(buffer, fpAm); /* copy a line of code which is not macro definition to .am file */
