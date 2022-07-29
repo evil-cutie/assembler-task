@@ -44,7 +44,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 			strcat(value, buffer);
 			value = (char*)realloc(value, sizeof(char)*MAX*i++);
 			if(!value)
-				printf("Memory allocation error: cannot allocate memory for value\n");
+				printf("Memory allocation error: cannot allocate memory for %p\n", value);
 			}
 			else
 			{
