@@ -15,4 +15,6 @@ static char base32chars[32] = {
 char *decimalToBinary(int num);
 int binaryToDecimal(char *binaryNum);
 char *twosComplement(char *num);
+char *decimalTo32(int num);
+char *binaryTo32(char *binary);
 /*************************************************************************************************/

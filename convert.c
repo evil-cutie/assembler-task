@@ -1,5 +1,39 @@
 #include "convert.h"
 
+/* convert binary to base 32 */
+char *binaryTo32(char *binary)
+{
+	int bit, num, i, pos;
+	char *base32 = (char*)malloc(sizeof(char)*2);
+	bit = num = 0;
+	pos = 1;
+	if(!base32)
+		printf("\nError: cannot allocate memory for %p",(void*)base32);
+	
+	for(i = BITS - 1; i >= 0; i--)
+	{
+		num += pow(2, bit) * (binary[i] - '0');
+		bit++;
+		if(bit == 5)
+		{
+			base32[pos] = base32chars[num];
+			num = bit = 0;
+			pos--;
+		}
+	}
+	return base32;
+}
+/* convert decimal to base 32 */
+char *decimalTo32(int num)
+{
+	char *temp; 
+	char *base32 = (char*)malloc(sizeof(char)*2);
+	if(!base32)
+		printf("\nError: cannot allocate memory for %p",(void*)base32);
+	temp = decimalToBinary(num);
+	base32 = binaryTo32(temp);
+	return base32;
+}
 /* convert decimal to binary */
 char *decimalToBinary(int num)
 {
@@ -87,4 +121,3 @@ char *twosComplement(char *num)
    complement[BITS] = '\0';
    return complement;
 }
-
