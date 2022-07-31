@@ -6,8 +6,7 @@ int main(int argc, char *argv[])
 	for (i = 1; i < argc; i++)
 	{	
 		macroPT head = NULL;
-		readAndCreateFile(argv[i], &head);
-		printList(head); 
+		readAndCreateFile(argv[i], &head); 
 		freeList(&head);
 	}
 }
