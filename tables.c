@@ -9,7 +9,7 @@ int isCommandName(char * word)
 	while(i++ <= COMMANDS)
 	{
 		if(strcmp(validCommands[i], word) == 0)
-			return 1;
+			return i;
 	}
 	return 0;
 }
@@ -23,7 +23,7 @@ int isDirName(char * word)
 	while(i++ <= DIRECTIVES)
 	{
 		if(strcmp(validDirectives[i], word) == 0)
-			return 1;
+            return i;
 	}
 	return 0;
 }
@@ -37,7 +37,7 @@ int isRegisterName(char * word)
 	while(i++ <= REGISTERS)
 	{
 		if(strcmp(validRegisters[i], word) == 0)
-			return 1;
+			return i;
 	}
 	return 0;
 }

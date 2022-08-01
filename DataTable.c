@@ -24,9 +24,15 @@ char ** split2words(char *);
 char * readNextCommand(FILE *fpAm)
 {
     static char buffer[MAX];
+
+    int i=0, length =0;
     if(fgets(buffer, MAX, fpAm)) {
         if(skip2command(buffer,fpAm)){
-            return buffer;
+            while(buffer[i] == ' '|| buffer[i] == '\t')
+                i++;
+            length = strlen(buffer);
+            buffer[length-1] = '\0';
+            return &buffer[i];
         }
     }
     return NULL;
@@ -34,20 +40,16 @@ char * readNextCommand(FILE *fpAm)
 
 char * readNextWord(char *buffer)
 {
-    char *currentWord;
-    char *txtPT;
-
+    char *currentWord, *txtPT;
+    int i = 0;
     currentWord = (char *)malloc(sizeof(char) * MAX);
 
     sscanf(buffer, "%s", currentWord);
-    int i = strlen(currentWord);
-
+    i = i+ strlen(currentWord);
     while(buffer[i] == ' '|| buffer[i] == '\t')
         i++;
     txtPT = buffer;
     txtPT = txtPT + i;
-    sscanf(txtPT, "%s", currentWord);
-
     return txtPT;
 }
 
