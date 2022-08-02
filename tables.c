@@ -11,7 +11,7 @@ int isCommandName(char * word)
 		if(strcmp(validCommands[i], word) == 0)
 			return i;
 	}
-	return 0;
+	return -1;
 }
 
 /* checks if a directive is valid */
@@ -25,7 +25,7 @@ int isDirName(char * word)
 		if(strcmp(validDirectives[i], word) == 0)
             return i;
 	}
-	return 0;
+	return -1;
 }
 
 /* checks if a register name is valid */
@@ -39,10 +39,5 @@ int isRegisterName(char * word)
 		if(strcmp(validRegisters[i], word) == 0)
 			return i;
 	}
-	return 0;
+	return -1;
 }
-
-
-
-
-

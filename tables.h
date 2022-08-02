@@ -26,7 +26,7 @@ static char other[MAX][MAX] = {
 
 /* valid directive names */
 static char validDirectives[DIRECTIVES][MAX] = {
-	 {".struct"}, {".data"}, {".string"}, {".entry"}
+	 {".struct"}, {".data"}, {".string"}, {".extern"}, {".entry"}
 };
 
 /******************************************* functions *******************************************/
