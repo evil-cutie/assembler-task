@@ -2,3 +2,5 @@
 *.dSYM
 *.am
 ./assembler
+*.o
+.vscode/
