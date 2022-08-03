@@ -14,8 +14,8 @@ void readAndCreateFile(char *fname, macroPT *head)
 	newMacro = FALSE;
 	strcpy(fnameAm, fname);
 	strcpy(fnameAs, fname);
-	strncat(fnameAm, ".am", 3);
-	strncat(fnameAs, ".as", 3);
+	strncat(fnameAm, ".am", 3); /* filename.am */
+	strncat(fnameAs, ".as", 3); /* filename.as */
 	
 	fpSource = fopen(fnameAs, "r");
 	if(!fpSource)
@@ -28,7 +28,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 	firstWord = (char*)malloc(sizeof(char)*MAX);
 	name = (char*)malloc(sizeof(char)*MAX);
 	
-	while(fgets(buffer, MAX, fpSource))
+	while(fgets(buffer, MAX, fpSource) && lineLength(buffer))
 	{	
 		sscanf(buffer, "%s", firstWord); /* scan a first word in a line */
 		foundMacro = findMacro(*head, firstWord);
@@ -54,7 +54,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 			memset(buffer, '\0', MAX);
 			}
 		}
-		if(!strcmp(firstWord, "macro")) /* found macro definition */
+		if(!strcmp(firstWord, "macro")) /* found new macro definition */
 		{
 			newMacro = TRUE;
 			value = (char*)malloc(sizeof(char)*MAX);
@@ -129,4 +129,14 @@ void freeList(macroPT *head)
 		*head = (*head)->next;
 		free(temp);
 	}
+}
+/* check line length, return 1 if legal and 0 if not */
+int lineLength(char *line)
+{
+	if(strlen(line) >= MAX) 
+	{
+		printf("\nError: a line must be 80 characters maximum\n");
+		return 0;
+	}
+	return 1;
 }
