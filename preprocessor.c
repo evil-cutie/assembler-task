@@ -28,8 +28,9 @@ void readAndCreateFile(char *fname, macroPT *head)
 	firstWord = (char*)malloc(sizeof(char)*MAX);
 	name = (char*)malloc(sizeof(char)*MAX);
 	
-	while(fgets(buffer, MAX, fpSource) && lineLength(buffer))
+	while(fgets(buffer, MAX, fpSource))
 	{	
+		lineLength(buffer); /* check if line length is valid */
 		sscanf(buffer, "%s", firstWord); /* scan a first word in a line */
 		foundMacro = findMacro(*head, firstWord);
 		if(foundMacro)
@@ -61,7 +62,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 			textptr = buffer;
 			textptr = textptr + strlen("macro"); /* move a pointer to the next word */
 			sscanf(textptr, "%s", name); /* scan next word */
-			if((isCommandName(name) > 0) || (isDirName(name) > 0) || (isRegisterName(name) > 0))
+			if((isCommandName(name) > -1) || (isDirName(name) > -1) || (isRegisterName(name) > -1))
 			{
 				printf("\nError: macro name cannot be '%s'\n", name);
 				newMacro = FALSE;
