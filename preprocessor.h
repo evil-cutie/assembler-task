@@ -17,4 +17,5 @@ void addMacro(macroPT *head, char *name, char *string);
 macroPT findMacro(macroPT head, char *name);
 void printList(macroPT head);
 void freeList(macroPT *head);
+int lineLength(char *line);
 /*************************************************************************************************/
