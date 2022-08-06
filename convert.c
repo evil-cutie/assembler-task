@@ -121,3 +121,30 @@ char *twosComplement(char *num)
    complement[BITS] = '\0';
    return complement;
 }
+
+char *opcode(char *nextword)
+{
+	int i;
+	for(i = 0; i < COMMANDS; i++)
+	{
+		if(!strcmp(nextword, validCommands[i]))
+			return binaryOpcode[i];
+	}
+	return NULL;
+}
+
+char *operand(char *nextword)
+{
+	int i;
+	for(i = 0; i < COMMANDS &&; i++)
+	{
+		if(!strcmp(nextword, validRegisters[i])) /* register addressing */
+			return "11";
+		if(!strcmp(nextword, ".struct") || !strcmp(nextword, ".data") || !strcmp(nextword, ".string")) /* direct addressing */
+			return "01";
+		if(!strcmp(nextword, "#")) /* instant addressing */
+			return "00";
+	}
+	return NULL;
+}
+
