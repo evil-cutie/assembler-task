@@ -39,7 +39,7 @@ char *decimalToBinary(int num)
 {
 	int i;
 	char temp;
-	char *binaryNum = (char*)malloc(sizeof(char)*10);
+	char *binaryNum = (char*)malloc(sizeof(char)*BITS);
 	int absnum = abs(num);
 	memset(binaryNum, '0', BITS);	
 	for(i = 0; absnum > 0; i++)    
@@ -146,5 +146,23 @@ char *operand(char *nextword)
 			return "00";
 	}
 	return NULL;
+}
+
+void decodeString(char *string)
+{
+	int i, value;
+	char *binary = (char*)malloc(sizeof(int)*BITS);
+	char *ptr = string;
+	for(i = 0; ptr != NULL; i++)
+	{
+		value = ptr[i] - '0'; /* ascii value of character */
+		binary = decimalToBinary(value);
+		addToTable(binary);
+	}
+}
+/* add binary code to table */
+void addToTable(char *binary)
+{
+	;
 }
 

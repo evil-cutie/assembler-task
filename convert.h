@@ -20,4 +20,5 @@ char *decimalTo32(int num);
 char *binaryTo32(char *binary);
 char *opcode(char *nextword);
 char *operand(char *nextword);
+void decodeString(char *string);
 /*************************************************************************************************/
