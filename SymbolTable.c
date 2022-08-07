@@ -17,8 +17,8 @@ int checkInList(symbolPT,char *);
 void freeSymbolList(symbolPT *);
 
 int isSymbol(char *);
+int isValidSymbol(symbolPT, char *);
 char *getSymbolLabel(char *);
-int add2symbolList(symbolPT *,char *);
 /*************************************************************************************************/
 /* create a new symbol and add it to the end of symbol list. return 1 if append is successful, 0 otherwise */
 int addToEnd(symbolPT* head,char *label,int address,short type)
@@ -27,7 +27,7 @@ int addToEnd(symbolPT* head,char *label,int address,short type)
     symbolPT pt;
 
     if(!new) {
-        printf("\nError: Cannot build symbol list\n");
+        printf("\nError: Cannot add symbol to list\n");
         return 0;
     }
 
@@ -74,31 +74,45 @@ void freeSymbolList(symbolPT *head)
 int isSymbol(char *buffer)
 {
     char *firstWord;
-    firstWord = (char*)malloc(sizeof(char)*MAX);
-    sscanf(buffer, "%s", firstWord);            /*get first word in line*/
+    int i;
+    i = strcspn(buffer, ":");                   /*get first word in line*/
+    firstWord = (char *)malloc(sizeof(char)*i);
+    memcpy( firstWord, buffer,i+1);
+    firstWord[i+1] = '\0';
     if(strstr(firstWord, ":"))                  /*check label definition*/
         return 1;
     return 0;
 }
-
-/*gets a pointer to line in text contains symbol definition and return pointer to symbol label*/
-char *getSymbolLabel(char *buffer)
+int isValidSymbol(symbolPT head, char *buffer)
 {
-    char *temp;
-    temp = (char*)malloc(sizeof(char)*MAX);
-    sscanf(buffer, "%s", temp);
-    char label[strlen(temp)-1];
-    memcpy( label, temp, strlen(temp)-1 );
-    label[strlen(temp)-1] = '\0';
-    printf("%s\n",label);
+    char label[MAX];
+    int i,j;
+    i = strcspn(buffer, " :\t");
+    if(buffer[i] != ':') {
+        printf("Label name error: white spaces or tab in label name ");
+        return 0;
+    }
+    memcpy( label, buffer,i);
+    label[i] = '\0';
+    if(checkInList(head,label)) {
+        printf("Label name error: multiple definition ");
+        return 0;
+    }
+    j= strspn(buffer+i+1," \t");
+    if(j == 0){
+        printf("Label name error: label in an empty line ");
+        return 0;
+    }
+    return 1;
 }
 
-int add2symbolList(symbolPT *head,char *buffer)
+/*gets a pointer to label name, does not check if label is valid*/
+char *getSymbolLabel(char *buffer)
 {
-    char *label = getSymbolLabel(buffer);
-    if(checkInList(*head,label))            /*if already*/
-        return 1;
-    if(addToEnd(head,label,0,0))
-        return 1;
-    return 0;
+    char *label, *temp;
+    int i;
+    i = strcspn(buffer, " :\t");
+    label = memcpy( label, buffer,i);
+    label[i] = '\0';
+    return label;
 }
