@@ -3,16 +3,18 @@
 #include <string.h>
 #include <ctype.h>
 #include "DataTable.h"
+
 #define MAX 81
 
 /******************************************* functions *******************************************/
-char * readNextCommand(FILE *);
+char * readNextLine(FILE *);
 int skip2command(char *,FILE *);
 char * readNextWord(char *);
+char * getCurrentWord(char *);
 
 /*************************************************************************************************/
 /*read next line in file. return pointer to line beginning*/
-char * readNextCommand(FILE *fpAm)
+char * readNextLine(FILE *fpAm)
 {
     static char buffer[MAX];
 
@@ -20,7 +22,8 @@ char * readNextCommand(FILE *fpAm)
     if(skip2command(buffer,fpAm)) {
         i = strspn(buffer, " \t");
         char *p = strchr(buffer + i, '\n');
-        *p = '\0';
+        if(p)
+            *p = '\0';
         return (buffer + i);
     } else
         return NULL;
@@ -29,8 +32,12 @@ char * readNextCommand(FILE *fpAm)
 char * readNextWord(char *buffer)
 {
     char *currentWord, *txtPT;
-    int i = 0;
+    int j,i = 0;
     currentWord = (char *)malloc(sizeof(char) * MAX);
+
+    j= strspn(buffer," \t");            /*if there is no next word*/
+    if(j == strlen(buffer))
+        return NULL;
 
     sscanf(buffer, "%s", currentWord);
     i = i+ strlen(currentWord);

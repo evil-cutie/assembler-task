@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
 #define MAX 81
 #define COMMANDS 16
 #define DIRECTIVES 3
@@ -27,14 +29,16 @@ typedef struct {
 } Command;
 
 typedef struct {
-    char buffer[MAX];
-    int cmdIdx;                          /*index of the tab of the command*/
+    char *line;
+    int opcode;
     AddressingMode AddressingMode[2];
     char* operand[2];                   /*pointer to the operands*/
 } AssemblerCommandLine;
 
+typedef struct AssemblerCommandLine *commandPT;
+
 typedef struct {
-    char buffer[MAX];
+    char line[MAX];
     int dirIdx;                          /*index of the tab of the directive*/
     DirectiveMode type;
     char* operand[2];                   /*pointer to the operands*/
@@ -71,8 +75,31 @@ static char binaryOpcode[COMMANDS][4] = {
         {"1000"}, {"1001"}, {"1010"}, {"1011"},
         {"1100"}, {"1101"}, {"1110"}, {"1111"}
 };
+static Command allCommands[] = {
+        {"mov", 0,  2,  {0,1,2,3} , {1,2,3,-1}},
+        {"cmp", 1,  2,  {0,1,2,3} , {0,1,2,3}},
+        {"add", 2,  2,  {0,1,2,3} , {1,2,3,-1}},
+        {"sub", 3,  2,  {0,1,2,3} , {0,1,2,3}},
+        {"not", 4,  1,  {-1}        , {1,2,3}},
+        {"clr", 5,  1,  {}        , {1,2,3}},
+        {"lea", 6,  2,  {1,2, -1}     , {1,2,3,-1}},
+        {"inc", 7,  1,  {}        , {1,2,3}},
+        {"dec", 8,  1,  {}        , {1,2,3}},
+        {"jmp", 9,  1,  {}        , {1,2,3}},
+        {"bne", 10, 1,  {}        , {1,2,3}},
+        {"get", 11, 1,  {}        , {1,2,3}},
+        {"prn", 12, 1,  {}        , {0,1,2,3}},
+        {"jsr", 13, 1,  {}        , {1,2,3}},
+        {"rts", 14, 0,  {}        , {}},
+        {"hlt", 15, 0,  {}        , {}}
+};
 /******************************************* functions *******************************************/
 int isCommandName(char * word);
 int isDirName(char * word);
 int isRegisterName(char * word);
+
+/*Command functions*/
+commandPT createCommand(int,char *);
+int isCommand(char *);
+int operandCount(char *);
 /*************************************************************************************************/

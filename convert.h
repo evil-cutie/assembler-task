@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include "tables.h"
 #define BITS 10
 
 /* base 32 characters */
@@ -17,4 +18,7 @@ int binaryToDecimal(char *binaryNum);
 char *twosComplement(char *num);
 char *decimalTo32(int num);
 char *binaryTo32(char *binary);
+char *opcode(char *nextword);
+char *operand(char *nextword);
+void decodeString(char *string);
 /*************************************************************************************************/

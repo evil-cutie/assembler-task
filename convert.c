@@ -39,7 +39,7 @@ char *decimalToBinary(int num)
 {
 	int i;
 	char temp;
-	char *binaryNum = (char*)malloc(sizeof(char)*10);
+	char *binaryNum = (char*)malloc(sizeof(char)*BITS);
 	int absnum = abs(num);
 	memset(binaryNum, '0', BITS);	
 	for(i = 0; absnum > 0; i++)    
@@ -121,3 +121,48 @@ char *twosComplement(char *num)
    complement[BITS] = '\0';
    return complement;
 }
+
+char *opcode(char *nextword)
+{
+	int i;
+	for(i = 0; i < COMMANDS; i++)
+	{
+		if(!strcmp(nextword, validCommands[i]))
+			return binaryOpcode[i];
+	}
+	return NULL;
+}
+
+char *operand(char *nextword)
+{
+	int i;
+	for(i = 0; i < COMMANDS &&; i++)
+	{
+		if(!strcmp(nextword, validRegisters[i])) /* register addressing */
+			return "11";
+		if(!strcmp(nextword, ".struct") || !strcmp(nextword, ".data") || !strcmp(nextword, ".string")) /* direct addressing */
+			return "01";
+		if(!strcmp(nextword, "#")) /* instant addressing */
+			return "00";
+	}
+	return NULL;
+}
+
+void decodeString(char *string)
+{
+	int i, value;
+	char *binary = (char*)malloc(sizeof(int)*BITS);
+	char *ptr = string;
+	for(i = 0; ptr != NULL; i++)
+	{
+		value = ptr[i] - '0'; /* ascii value of character */
+		binary = decimalToBinary(value);
+		addToTable(binary);
+	}
+}
+/* add binary code to table */
+void addToTable(char *binary)
+{
+	;
+}
+

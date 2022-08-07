@@ -85,28 +85,28 @@ int isSymbol(char *buffer)
 }
 int isValidSymbol(symbolPT head, char *buffer)
 {
-    char *label, *temp;
-    int i;
+    char label[MAX];
+    int i,j;
     i = strcspn(buffer, " :\t");
     if(buffer[i] != ':') {
         printf("Label name error: white spaces or tab in label name ");
         return 0;
     }
-    label = memcpy( label, buffer,i);
+    memcpy( label, buffer,i);
     label[i] = '\0';
     if(checkInList(head,label)) {
         printf("Label name error: multiple definition ");
         return 0;
     }
-    temp = (char *)malloc(sizeof(char)*MAX);
-    sscanf((buffer+i+1), "%s", temp);
-    if(sscanf((buffer+i+1), "%s", temp) == EOF){
-        printf("Label name error: label value was not initialized ");
+    j= strspn(buffer+i+1," \t");
+    if(j == 0){
+        printf("Label name error: label in an empty line ");
         return 0;
-    } else
-        return 1;
+    }
+    return 1;
 }
-/*gets a pointer to label name, does not check if valid*/
+
+/*gets a pointer to label name, does not check if label is valid*/
 char *getSymbolLabel(char *buffer)
 {
     char *label, *temp;
