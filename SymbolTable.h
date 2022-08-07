@@ -8,6 +8,7 @@ typedef struct nodeSymbol
 {
     char *label;
     int address;                   /* in decimal*/
+    int offset;
     short type;                    /*directive: 0,command: 1,external: 2, code: 3 */
     symbolPT next;
 }nodeSymbol;
