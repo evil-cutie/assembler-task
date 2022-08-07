@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "DataTable.h"
 
 #define MAX 81
 #define COMMANDS 16
@@ -32,6 +31,7 @@ typedef struct {
 typedef struct {
     char *line;
     int opcode;
+    int numOperands;
     AddressingMode AddressingMode[2];
     char* operand[2];                   /*pointer to the operands*/
 } AssemblerCommandLine;

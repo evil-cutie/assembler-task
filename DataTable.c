@@ -1,15 +1,5 @@
 #include "DataTable.h"
-/******************************************* functions *******************************************/
-char * readNextLine(FILE *);
-int skip2command(char *,FILE *);
-char * readNextWord(char *);
-char * getCurrentWord(char *);
 
-/*Command functions*/
-commandPT createCommand(int,char *);
-int isCommand(char *);
-int operandCount(char *);
-/*************************************************************************************************/
 /*read next line in file. return pointer to line beginning*/
 char * readNextLine(FILE *fpAm)
 {
@@ -32,12 +22,10 @@ char * readNextWord(char *buffer)
     int j,i = 0;
     currentWord = (char *)malloc(sizeof(char) * MAX);
 
-    j= strspn(buffer," \t");            /*if there is no next word*/
-    if(j == strlen(buffer))
-        return NULL;
-
     sscanf(buffer, "%s", currentWord);
     i = i+ strlen(currentWord);
+    if(buffer[i] == '\0')
+        return NULL;
     while(buffer[i] == ' '|| buffer[i] == '\t')
         i++;
     txtPT = buffer;
@@ -87,7 +75,7 @@ commandPT createCommand(int op,char *command)
     new = &assemblerLine;
     assemblerLine.line = command;
     assemblerLine.opcode = op;
-
+    assemblerLine.numOperands = operandCount(command);
     return new;
 }
 

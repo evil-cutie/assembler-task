@@ -1,11 +1,5 @@
 #include "tables.h"
 
-/******************************************* functions *******************************************/
-int isCommandName(char *);
-int isDirName(char * word);
-int isRegisterName(char *);
-/*************************************************************************************************/
-
 /* checks if a command is valid */
 /* return 1 if valid */
 /* return 0 if not valid */

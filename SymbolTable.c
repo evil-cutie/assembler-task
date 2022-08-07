@@ -1,22 +1,5 @@
 #include "SymbolTable.h"
 
-typedef struct nodeSymbol *symbolPT;
-typedef struct nodeSymbol
-{
-    char *label;
-    int address;                   /* in decimal*/
-    short type;                    /*directive: 0,command: 1,external: 2, code: 3 */
-    symbolPT next;
-}nodeSymbol;
-/******************************************* functions *******************************************/
-int addToEnd(symbolPT *,char *,int,short);
-int checkInList(symbolPT,char *);
-void freeSymbolList(symbolPT *);
-
-int isSymbol(char *);
-int isValidSymbol(symbolPT, char *);
-char *getSymbolLabel(char *);
-/*************************************************************************************************/
 /* create a new symbol and add it to the end of symbol list. return 1 if append is successful, 0 otherwise */
 int addToEnd(symbolPT* head,char *label,int address,short type)
 {
