@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#define MAX 81
+#include "SymbolTable.h"
 
 typedef struct nodeSymbol *symbolPT;
 typedef struct nodeSymbol

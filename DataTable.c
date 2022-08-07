@@ -1,11 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 #include "DataTable.h"
-
-#define MAX 81
-
 /******************************************* functions *******************************************/
 char * readNextLine(FILE *);
 int skip2command(char *,FILE *);
