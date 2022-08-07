@@ -97,9 +97,4 @@ static Command allCommands[] = {
 int isCommandName(char * word);
 int isDirName(char * word);
 int isRegisterName(char * word);
-
-/*Command functions*/
-commandPT createCommand(int,char *);
-int isCommand(char *);
-int operandCount(char *);
 /*************************************************************************************************/

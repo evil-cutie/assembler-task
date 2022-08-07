@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include "tables.h"
+
 #define MAX 81
 enum flag {OFF,ON};
 
@@ -10,4 +12,9 @@ char * readNextLine(FILE *);
 int skip2command(char *,FILE *);
 char * readNextWord(char *);
 char * getCurrentWord(char *);
+
+/*Command functions*/
+commandPT createCommand(int,char *);
+int isCommand(char *);
+int operandCount(char *);
 /*************************************************************************************************/
