@@ -150,14 +150,15 @@ char *operand(char *nextword)
 
 void decodeString(char *string)
 {
-	int i, value;
+	int value;
 	char *binary = (char*)malloc(sizeof(int)*BITS);
 	char *ptr = string;
-	for(i = 0; ptr[i] != NULL; i++)
+	while(ptr)
 	{
-		value = ptr[i] - '0'; /* ascii value of character */
+		value = *ptr - '0'; /* ascii value of character */
 		binary = decimalToBinary(value);
 		addToTable(binary);
+		ptr++;
 	}
 }
 /* add binary code to table */

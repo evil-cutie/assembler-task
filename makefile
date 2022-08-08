@@ -1,5 +1,5 @@
 assembler:	preprocessor.o main.o tables.o	convert.o	symboltable.o	datatable.o
-	gcc	-g	-Wall	-ansi	-pedantic	preprocessor.o	main.o	tables.o	convert.o	-o	assembler
+	gcc	-g	-Wall	-ansi	-pedantic	preprocessor.o	main.o	tables.o	convert.o	datatable.o	symboltable.o	-o	assembler
 preprocessor.o: preprocessor.c preprocessor.h tables.h
 	gcc	-c	-Wall	-ansi	-pedantic	preprocessor.c	-o	preprocessor.o
 main.o: main.c preprocessor.h
