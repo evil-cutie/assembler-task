@@ -1,8 +1,8 @@
 #include "tables.h"
 
 /* checks if a command is valid */
-/* return 1 if valid */
-/* return 0 if not valid */
+/* return command dec value if valid */
+/* return -1 if not valid */
 int isCommandName(char * word)
 {
     int i = 0;
@@ -15,8 +15,8 @@ int isCommandName(char * word)
 }
 
 /* checks if a directive is valid */
-/* return 1 if valid */
-/* return 0 if not valid */
+/* return dir dec value if valid */
+/* return -1 if not valid */
 int isDirName(char * word)
 {
     int i = 0;
@@ -29,8 +29,8 @@ int isDirName(char * word)
 }
 
 /* checks if a register name is valid */
-/* return 1 if valid */
-/* return 0 if not valid */
+/* return register dec value if valid */
+/* return -1 if not valid */
 int isRegisterName(char * word)
 {
     int i = 0;
