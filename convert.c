@@ -136,7 +136,7 @@ char *opcode(char *nextword)
 char *operand(char *nextword)
 {
 	int i;
-	for(i = 0; i < COMMANDS &&; i++)
+	for(i = 0; i < COMMANDS; i++)
 	{
 		if(!strcmp(nextword, validRegisters[i])) /* register addressing */
 			return "11";
@@ -153,7 +153,7 @@ void decodeString(char *string)
 	int i, value;
 	char *binary = (char*)malloc(sizeof(int)*BITS);
 	char *ptr = string;
-	for(i = 0; ptr != NULL; i++)
+	for(i = 0; ptr[i] != NULL; i++)
 	{
 		value = ptr[i] - '0'; /* ascii value of character */
 		binary = decimalToBinary(value);

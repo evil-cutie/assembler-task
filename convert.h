@@ -21,4 +21,5 @@ char *binaryTo32(char *binary);
 char *opcode(char *nextword);
 char *operand(char *nextword);
 void decodeString(char *string);
+void addToTable(char *binary);
 /*************************************************************************************************/
