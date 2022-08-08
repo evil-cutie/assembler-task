@@ -4,6 +4,7 @@
 #include <ctype.h>
 #define MAX 81
 
+enum status {OFF, ON} error;
 enum boolean {FALSE, TRUE} newMacro;
 typedef struct macroLS * macroPT;
 typedef struct macroLS {
@@ -17,5 +18,5 @@ void addMacro(macroPT *head, char *name, char *string);
 macroPT findMacro(macroPT head, char *name);
 void printList(macroPT head);
 void freeList(macroPT *head);
-int lineLength(char *line);
+void lineLength(char *line);
 /*************************************************************************************************/

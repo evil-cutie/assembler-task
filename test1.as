@@ -1,7 +1,7 @@
 MAIN: mov S1.1 ,LENGTH
 add r2,STR
 LOOP: jmp END
-macro r1
+macro m1
 inc K
 mov S1.2 ,r3
 endmacro

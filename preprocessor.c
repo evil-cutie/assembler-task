@@ -8,7 +8,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 	FILE *fpAm; /* pointer to ".am" file */
 	macroPT foundMacro = NULL;
 	char *firstWord, *name, *textptr, *value;
-	char fnameAm[MAX], fnameAs[MAX], buffer[MAX];
+	char fnameAm[MAX], fnameAs[MAX], buffer[100];
 	int i = 1;
 	value = name = textptr = firstWord = NULL;
 	newMacro = FALSE;
@@ -28,7 +28,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 	firstWord = (char*)malloc(sizeof(char)*MAX);
 	name = (char*)malloc(sizeof(char)*MAX);
 	
-	while(fgets(buffer, MAX, fpSource))
+	while(fgets(buffer, 100, fpSource))
 	{	
 		lineLength(buffer); /* check if line length is valid */
 		sscanf(buffer, "%s", firstWord); /* scan a first word in a line */
@@ -65,6 +65,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 			if((isCommandName(name) > -1) || (isDirName(name) > -1) || (isRegisterName(name) > -1))
 			{
 				printf("\nError: macro name cannot be '%s'\n", name);
+				error = ON;
 				newMacro = FALSE;
 			}
 		}
@@ -73,6 +74,9 @@ void readAndCreateFile(char *fname, macroPT *head)
 	}
 	fclose(fpSource);
 	fclose(fpAm);
+	
+	if(error)
+		remove(fnameAm);
 }
 /* add new macro to list */
 void addMacro(macroPT *head, char *name, char *string)
@@ -131,13 +135,12 @@ void freeList(macroPT *head)
 		free(temp);
 	}
 }
-/* check line length, return 1 if legal and 0 if not */
-int lineLength(char *line)
-{
+/* check line length */
+void lineLength(char *line)
+{	
 	if(strlen(line) >= MAX) 
 	{
 		printf("\nError: a line must be 80 characters maximum\n");
-		return 0;
+		error = ON;
 	}
-	return 1;
 }
