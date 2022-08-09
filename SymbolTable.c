@@ -54,7 +54,7 @@ void freeSymbolList(symbolPT *head)
 int isSymbol(char *buffer)
 {
     char *firstWord;
-    int i;
+    unsigned long i;
     i = strcspn(buffer, ":");                   /*get first word in line*/
     firstWord = (char *)malloc(sizeof(char)*i);
     memcpy( firstWord, buffer,i+1);
@@ -66,7 +66,7 @@ int isSymbol(char *buffer)
 int isValidSymbol(symbolPT head, char *buffer)
 {
     char label[MAX];
-    int i,j;
+    unsigned long i,j;
     i = strcspn(buffer, " :\t");
     if(buffer[i] != ':') {
         printf("Label name error: white spaces or tab in label name ");
@@ -89,8 +89,8 @@ int isValidSymbol(symbolPT head, char *buffer)
 /*gets a pointer to label name, does not check if label is valid*/
 char *getSymbolLabel(char *buffer)
 {
-    char *label, *temp;
-    int i;
+    char *label;
+    unsigned long i;
     i = strcspn(buffer, " :\t");
     label = memcpy( label, buffer,i);
     label[i] = '\0';
