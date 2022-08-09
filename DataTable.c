@@ -17,6 +17,7 @@ char * readNextLine(FILE *fpAm)
         return NULL;
 }
 
+/*points to next word in given line. get: current line in file. return: pointer to next word beginning*/
 char * readNextWord(char *buffer)
 {
     char *currentWord, *txtPT;
@@ -33,6 +34,7 @@ char * readNextWord(char *buffer)
     txtPT = txtPT + i;
     return txtPT;
 }
+/*reads next word in given line. get: current line in file. return: pointer to next word only*/
 char * getCurrentWord(char *buffer)
 {
     char *currentWord;
@@ -69,6 +71,8 @@ int skip2command(char *buffer,FILE *fpAm)
 }
 
 /************************************ Command functions ************************************/
+/*checks if first word in line is a valid command. get: pointer to line
+ * return: opcode if command is valid, -1 otherwise*/
 int isCommand(char *line)
 {
     int opcode;
@@ -82,6 +86,7 @@ int isCommand(char *line)
     return -1;
 }
 
+/*creat a command object out of line. get: int -op code,char *-current line, return:pointer to new command */
 commandPT createCommand(int op,char *command)
 {
     SynthaxError = OFF;
@@ -100,11 +105,12 @@ commandPT createCommand(int op,char *command)
     return newCommand;
 }
 
+/*count no. of operands in line. get: pointer to current line, return: no of operands*/
 int operandCount(char *buffer)
 {
     char * txtPT;
     int operandIdx, i = 0;
-    if((txtPT = readNextWord(buffer)) == NULL)        /*skips command/directive name*/
+    if((txtPT = readNextWord(buffer)) == NULL)        /*skips command or directive name*/
         return i;
     else
         i++;
@@ -115,6 +121,10 @@ int operandCount(char *buffer)
         operandIdx = strcspn(txtPT,",");
     }
     return i;
+}
+int * getOpLocation(char *line)
+{
+    ;
 }
 
 int isImmediate(char *opLocation)
