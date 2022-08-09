@@ -1,12 +1,11 @@
 #include "DataTable.h"
-enum flag SynthaxError = OFF;
+enum flag SyntaxError = OFF;
 
 /*read next line in file. return pointer to line beginning*/
 char * readNextLine(FILE *fpAm)
 {
     static char buffer[MAX];
-
-    int i=0, length =0;
+    unsigned long i=0;
     if(skip2command(buffer,fpAm)) {
         i = strspn(buffer, " \t");
         char *p = strchr(buffer + i, '\n');
@@ -21,7 +20,7 @@ char * readNextLine(FILE *fpAm)
 char * readNextWord(char *buffer)
 {
     char *currentWord, *txtPT;
-    int j,i = 0;
+    unsigned long i = 0;
     currentWord = (char *)malloc(sizeof(char) * MAX);
 
     sscanf(buffer, "%s", currentWord);
@@ -38,7 +37,7 @@ char * readNextWord(char *buffer)
 /*reads next word in given line. get: current line in file. return: pointer to next word only*/
 char * getCurrentWord(char *buffer)
 {
-    int i;
+    unsigned long i;
     char *currentWord;
     currentWord = (char *)malloc(sizeof(char) * MAX);
 
@@ -93,7 +92,7 @@ int isCommand(char *line)
 /*creat a command object out of line. get: int -op code,char *-current line, return:pointer to new command */
 commandPT createCommand(int op,char *command)
 {
-    SynthaxError = OFF;
+    SyntaxError = OFF;
     int addMode,i=0;
     int *opLocs;
     commandPT newCommand = (commandPT)malloc(sizeof(AssemblerCommandLine));
@@ -105,7 +104,7 @@ commandPT createCommand(int op,char *command)
     /*get no. of operands and pointers to their location*/
     if(newCommand->numOperands >2) {
         printf("Command error: too many operands ");
-        SynthaxError = ON;
+        SyntaxError = ON;
     } else
     {
         opLocs = getOpLocation(command, newCommand->numOperands);
@@ -117,7 +116,7 @@ commandPT createCommand(int op,char *command)
     if(newCommand->numOperands > 0 && newCommand->numOperands < 3 ){
         addMode = isImmediate(newCommand->operand[0]);
     }
-    if(SynthaxError == ON)
+    if(SyntaxError == ON)
         return NULL;
     return newCommand;
 }
@@ -126,7 +125,8 @@ commandPT createCommand(int op,char *command)
 int operandCount(char *buffer)
 {
     char * txtPT;
-    int operandIdx, i = 0;
+    int i = 0;
+    unsigned long operandIdx;
     if((txtPT = readNextWord(buffer)) == NULL)        /*skips command or directive name*/
         return i;
     else
@@ -145,11 +145,11 @@ int *getOpLocation(char *buffer, int opNo)
     static int locs[2];
     if(opNo == 0)
         return NULL;
-    int operandIdx;
+    unsigned long operandIdx;
 
     operandIdx = strcspn(buffer, " \t");                            /*skips command or directive name*/
     operandIdx = operandIdx + strspn(buffer+operandIdx, " \t");
-    locs[0] = operandIdx;
+    locs[0] = (int)operandIdx;
     if(opNo ==2){
         operandIdx = operandIdx + strcspn(buffer+operandIdx,",");       /*skips first operand*/
         operandIdx = operandIdx + strspn(buffer+operandIdx, ", \t");     /*skips whitespaces and ','*/
@@ -160,10 +160,21 @@ int *getOpLocation(char *buffer, int opNo)
 }
 
 /*************************** addressing mode determination functions *******************************/
+AddressingMode getAddressMode(char *opLocation)
+{
+    AddressingMode opAddMode = -1;
+    if(isImmediate(opLocation) != -1)
+        return modeImmediate;
+    if(isRegisterName(opLocation) != -1)
+        return modeRegister;
+    if(isStruct(opLocation) !=-1)
+        return modeStruct;
+    return modeDirect;
+}
 /*check if addressing mode is immediate. return 0 if it is, -1 otherwise*/
 int isImmediate(char *opLocation)
 {
-    int i,j;
+    unsigned long i,j;
     i = strcspn(opLocation, "#");       /*check if an immediate declaration*/
     if (i ==strlen(opLocation))
         return -1;
@@ -178,4 +189,9 @@ int isImmediate(char *opLocation)
         return -1;
     }
     return modeImmediate;
+}
+
+int isStruct(char *opLocation)
+{
+    ;
 }
