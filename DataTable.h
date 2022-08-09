@@ -17,4 +17,7 @@ char * getCurrentWord(char *);
 commandPT createCommand(int,char *);
 int isCommand(char *);
 int operandCount(char *);
+
+/*Addressing mode determination functions*/
+int isImmediate(char *);
 /*************************************************************************************************/

@@ -1,4 +1,5 @@
 #include "DataTable.h"
+enum flag SynthaxError = OFF;
 
 /*read next line in file. return pointer to line beginning*/
 char * readNextLine(FILE *fpAm)
@@ -67,16 +68,36 @@ int skip2command(char *buffer,FILE *fpAm)
         return 0;
 }
 
+/************************************ Command functions ************************************/
+int isCommand(char *line)
+{
+    int opcode;
+    char *currWord;
+
+    currWord = getCurrentWord(line);
+    for (opcode =0;opcode<COMMANDS;opcode++){
+        if (strcmp(allCommands[opcode].name,currWord)==0)
+            return opcode;
+    }
+    return -1;
+}
+
 commandPT createCommand(int op,char *command)
 {
+    SynthaxError = OFF;
     int i=0;
-    AssemblerCommandLine assemblerLine;
-    commandPT new = (commandPT)malloc(sizeof(commandPT));
-    new = &assemblerLine;
-    assemblerLine.line = command;
-    assemblerLine.opcode = op;
-    assemblerLine.numOperands = operandCount(command);
-    return new;
+    commandPT newCommand = (commandPT)malloc(sizeof(AssemblerCommandLine));
+
+    newCommand->line = command;
+    newCommand->opcode = op;
+    newCommand->numOperands = operandCount(command);
+    if(newCommand->numOperands >2) {
+        printf("Command error: too many operands ");
+        SynthaxError = ON;
+    }
+    if(SynthaxError == ON)
+        return NULL;
+    return newCommand;
 }
 
 int operandCount(char *buffer)
@@ -96,15 +117,7 @@ int operandCount(char *buffer)
     return i;
 }
 
-int isCommand(char *line)
+int isImmediate(char *opLocation)
 {
-    int opcode;
-    char *currWord;
-
-    currWord = getCurrentWord(line);
-    for (opcode =0;opcode<COMMANDS;opcode++){
-        if (strcmp(allCommands[opcode].name,currWord)==0)
-            return opcode;
-    }
-    return -1;
+    ;
 }
