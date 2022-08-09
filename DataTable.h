@@ -17,7 +17,10 @@ char * getCurrentWord(char *);
 commandPT createCommand(int,char *);
 int isCommand(char *);
 int operandCount(char *);
+int * getOpLocation(char *buffer, int opNo);
 
 /*Addressing mode determination functions*/
+AddressingMode getAddressMode(char *);
 int isImmediate(char *);
+int isStruct(char *);
 /*************************************************************************************************/

@@ -93,7 +93,7 @@ int isCommand(char *line)
 commandPT createCommand(int op,char *command)
 {
     SyntaxError = OFF;
-    int addMode,i=0;
+    int i=0;
     int *opLocs;
     commandPT newCommand = (commandPT)malloc(sizeof(AssemblerCommandLine));
 
@@ -114,7 +114,8 @@ commandPT createCommand(int op,char *command)
 
     /*determine addressing modes of operands*/
     if(newCommand->numOperands > 0 && newCommand->numOperands < 3 ){
-        addMode = isImmediate(newCommand->operand[0]);
+        for(i=0;i<newCommand->numOperands;i++)
+            newCommand->addressingMode[i] = getAddressMode(newCommand->operand[i]);
     }
     if(SyntaxError == ON)
         return NULL;
@@ -153,7 +154,7 @@ int *getOpLocation(char *buffer, int opNo)
     if(opNo ==2){
         operandIdx = operandIdx + strcspn(buffer+operandIdx,",");       /*skips first operand*/
         operandIdx = operandIdx + strspn(buffer+operandIdx, ", \t");     /*skips whitespaces and ','*/
-        locs[1] = operandIdx;
+        locs[1] = (int)operandIdx;
     } else
         locs[1] = NULL;
     return locs;
@@ -183,7 +184,7 @@ int isImmediate(char *opLocation)
         return -1;
     }
     j = strspn(opLocation+i+1, "-1234567890");
-    if( j != strlen(opLocation+i+1))  /*check if an integer is declared*/
+    if( j != strlen(opLocation+i+1))            /*check if an integer is declared*/
     {
         printf("Immediate addressing mode error: not an int ");
         return -1;
@@ -191,7 +192,29 @@ int isImmediate(char *opLocation)
     return modeImmediate;
 }
 
+/*check if addressing mode is Struct. return 3 if it is, -1 otherwise*/
 int isStruct(char *opLocation)
 {
-    ;
+    char *field, *field1, *field2;
+    int idx;
+
+    field1 = strstr(opLocation,".1");
+    field2 = strstr(opLocation,".2");
+    if(!field1 != !field2)                      /*check for addressing to field 1 XOR 2 */
+    {
+        if(field1 != NULL)                      /*get non NULL option*/
+            field = field1;
+        else
+            field = field2;
+        idx = field - opLocation;
+        if(idx != (strlen(opLocation)-2))   /*check if .1 or .2 appear at the end of the label*/
+        {
+            printf("Struct addressing error ");
+            return -1;
+        }
+        return modeStruct;
+    }
+    if(field1 && field2)
+        printf("Struct addressing error ");
+    return -1;
 }
