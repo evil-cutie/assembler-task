@@ -28,15 +28,14 @@ typedef struct {
     int modeDestination[ADDRESSING_MODES];
 } Command;
 
-typedef struct {
+typedef struct AssemblerCommandLine *commandPT;
+typedef struct AssemblerCommandLine{
     char *line;
     int opcode;
     int numOperands;
     AddressingMode AddressingMode[2];
     char* operand[2];                   /*pointer to the operands*/
 } AssemblerCommandLine;
-
-typedef struct AssemblerCommandLine *commandPT;
 
 typedef struct {
     char line[MAX];
