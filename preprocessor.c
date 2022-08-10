@@ -2,7 +2,7 @@
 #include "tables.h"
 
 /* read .as file and create .am file with macro expansion */
-void readAndCreateFile(char *fname, macroPT *head)
+FILE *readAndCreateFile(char *fname, macroPT *head)
 {
 	FILE *fpSource; /*pointer to a source file */
 	FILE *fpAm; /* pointer to ".am" file */
@@ -65,7 +65,7 @@ void readAndCreateFile(char *fname, macroPT *head)
 			if((isCommandName(name) > -1) || (isDirName(name) > -1) || (isRegisterName(name) > -1))
 			{
 				printf("\nError: macro name cannot be '%s'\n", name);
-				error = ON;
+				error = TRUE;
 				newMacro = FALSE;
 			}
 		}
@@ -73,10 +73,14 @@ void readAndCreateFile(char *fname, macroPT *head)
 			fputs(buffer, fpAm); /* copy a line of code which is not macro definition to .am file */
 	}
 	fclose(fpSource);
-	fclose(fpAm);
+	rewind(fpAm);
 	
-	if(error)
+	if(error) 
+	{
 		remove(fnameAm);
+		printf("removed file\n");
+	}
+	return fpAm;
 }
 /* add new macro to list */
 void addMacro(macroPT *head, char *name, char *string)
@@ -141,6 +145,6 @@ void lineLength(char *line)
 	if(strlen(line) >= MAX) 
 	{
 		printf("\nError: a line must be 80 characters maximum\n");
-		error = ON;
+		error = TRUE;
 	}
 }
