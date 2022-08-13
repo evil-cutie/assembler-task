@@ -115,7 +115,7 @@ commandPT createCommand(int op,char *command)
     /*determine addressing modes of operands*/
     if(newCommand->numOperands > 0 && newCommand->numOperands < 3 ){
         for(i=0;i<newCommand->numOperands;i++)
-            newCommand->addressingMode[i] = getAddressMode(newCommand->operand[i]);
+            newCommand->AddressingMode[i] = getAddressMode(newCommand->operand[i]);
     }
     if(SyntaxError == ON)
         return NULL;

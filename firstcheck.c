@@ -1,65 +1,31 @@
 #include "firstcheck.h"
-#include "SymbolTable.h"
-#include "DataTable.h"
 
-
-enum flag symbolFlag = OFF;
-enum flag errorFlag = OFF;
-
-void firstCheck(char *fileName)
+void firstCheck(char *fileName, labelPT *head)
 {
-   /* int IC, DC;
-    IC = DC = 0; 
-    char nextline[MAX]; */
     FILE *filePointer;
+    char nextline[MAX];
+    int *IC = (int*)malloc(sizeof(int));
+    int *DC = (int*)malloc(sizeof(int));
+    *IC = *DC = 0;
+ 
     strncat(fileName, ".am", 3);
-    filePointer = fopen(fileName, "r+");
-    scan1(filePointer);
-    /*while(fgets(nextline, MAX, filePointer))
+    filePointer = fopen(fileName, "r");
+    
+    while(fgets(nextline, MAX, filePointer))
     {
         char **nextword = getNextWord(nextline);
-        checkLine(nextword);
-     }*/
-}
-
-void scan1(FILE *fpAm) {
-    symbolPT head = NULL;
-    symbolPT *symbolListHead = &head;
-
-    int IC, DC, i, lineCount;
-    IC = DC = i = lineCount = 0;
-    char *line;
-    char *txtPT;
-
-    line = (char *) malloc(sizeof(char) * MAX);
-    txtPT = (char *) malloc(sizeof(char) * MAX);
-
-    while (line = readNextLine(fpAm)) {
-        lineCount++;
-        printf("%s\n", line);
-        if (isSymbol(line)) {
-            symbolFlag = ON;
-            if (!isValidSymbol(head,line))
-                printf(" (line %d)\n", lineCount);
-            else
-                addToEnd(symbolListHead,getSymbolLabel(line),0,0);
-            txtPT = readNextWord(line);
-        } else
-            txtPT = line;
-        if( (i = isCommand(txtPT)) != -1) {
-            commandPT newCommand = createCommand(i,txtPT);
-            if(newCommand == NULL)
-                printf(" (line %d)\n", lineCount);
-            printf("number of operands in line: %d\n",operandCount(txtPT));
-        }
+        checkLine(nextword, DC, IC, head);
+        printf("\n%d %d", *DC, *IC);
     }
 }
 
+
+
 char **getNextWord(char *line)
 {
-    int i = 0;
     char delim[] = {' ', '\t', ','};
     char **nextword;
+    int i = 0;
     nextword = (char **)malloc(MAX * sizeof(*nextword));
     
     nextword[0] = strtok(line, delim);
@@ -71,22 +37,31 @@ char **getNextWord(char *line)
     return nextword;
 }
 
-void checkLine(char **line, int DC)
+void checkLine(char **line, int *DC, int *IC, labelPT *head)
 {
-    int labelFlag = 0;
+    int tempIC = *IC;
+    int tempDC = *DC;
     int i = 0;
     if (isLabel(line[0]))
     {
-        labelFlag = 1;
+        label = TRUE;
         if (isDirName(line[1]))
-            addToLableTable(line[0], DC, "data");
+        {
+            if(!findLabel(*head, line[0]))
+                addLabel(head, line[0], tempDC, 0); /* data type = 0 */
+            else
+                printf("Error: label %s already exists", line[1]);
+            
+        }
     }
     while(line[i])
     {
         
         i++;
     }
-}
+    *DC = tempDC;
+    *IC = tempIC;
+} 
 
 int isLabel(char *word)
 {
@@ -95,9 +70,5 @@ int isLabel(char *word)
     return 0;
 }
 
-void addToLableTable(char *label, int address, char *type)
-{
-   /* printf("\n%s", label); */
-}
 
 
