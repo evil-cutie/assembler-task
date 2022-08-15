@@ -1,4 +1,3 @@
-#include "preprocessor.h"
 #include "firstcheck.h"
 
 int main(int argc, char *argv[])

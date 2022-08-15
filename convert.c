@@ -1,4 +1,5 @@
 #include "convert.h"
+#include "tables.h"
 
 /* convert binary to base 32 */
 char *binaryTo32(char *binary)
@@ -122,48 +123,5 @@ char *twosComplement(char *num)
    return complement;
 }
 
-char *opcode(char *nextword)
-{
-	int i;
-	for(i = 0; i < COMMANDS; i++)
-	{
-		if(!strcmp(nextword, validCommands[i]))
-			return binaryOpcode[i];
-	}
-	return NULL;
-}
 
-char *operand(char *nextword)
-{
-	int i;
-	for(i = 0; i < COMMANDS; i++)
-	{
-		if(!strcmp(nextword, validRegisters[i])) /* register addressing */
-			return "11";
-		if(!strcmp(nextword, ".struct") || !strcmp(nextword, ".data") || !strcmp(nextword, ".string")) /* direct addressing */
-			return "01";
-		if(!strcmp(nextword, "#")) /* instant addressing */
-			return "00";
-	}
-	return NULL;
-}
-
-void decodeString(char *string)
-{
-	int value;
-	char *binary = (char*)malloc(sizeof(int)*BITS);
-	char *ptr = string;
-	while(ptr)
-	{
-		value = *ptr - '0'; /* ascii value of character */
-		binary = decimalToBinary(value);
-		addToTable(binary);
-		ptr++;
-	}
-}
-/* add binary code to table */
-void addToTable(char *binary)
-{
-	;
-}
 

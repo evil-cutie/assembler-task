@@ -1,10 +1,11 @@
 #include "preprocessor.h"
 #include "ltable.h"
-#include "tables.h"
+#include "convert.h"
 #define SIZE 1000
 
-static char instructions[SIZE][10];
-static char data[SIZE][10];
+static char instructions[SIZE][BITS + 1];
+static char data[SIZE][BITS + 1];
+
 enum boolean label;
 enum boolean compilationError;
 
@@ -12,5 +13,13 @@ enum boolean compilationError;
 void firstCheck(char *filename, labelPT *head);
 char **getNextWord(char *line);
 void checkLine(char **nextword, int *DC, int *IC, labelPT *head);
-int isLabel(char *word);
+int isLabelDef(char *word);
+char *operand(char *nextword);
+char *opcode(char *nextword);
+int decodeString(char *string, int DC);
+int decodeData(char **line, int DC);
+int decodeStruct(char **line, int DC);
+int isLegalLabel(char *label);
+int decodeCommand(char **line, int pos, int IC);
+void printBinary();
 /*************************************************************************************************/

@@ -1,12 +1,12 @@
 assembler:	preprocessor.o main.o tables.o	convert.o	firstcheck.o	ltable.o
 	gcc	-g	-Wall	-ansi	-pedantic	preprocessor.o	main.o	tables.o	convert.o	ltable.o	firstcheck.o	-o	assembler
-preprocessor.o: preprocessor.c preprocessor.h tables.h
+preprocessor.o: preprocessor.c preprocessor.h 
 	gcc	-c	-Wall	-ansi	-pedantic	preprocessor.c	-o	preprocessor.o
-main.o: main.c preprocessor.h
+main.o: main.c firstcheck.h
 	gcc	-c	-Wall	-ansi	-pedantic	main.c	-o	main.o
-tables.o: tables.c tables.h DataTable.h
+tables.o: tables.c tables.h 
 	gcc	-c	-Wall	-ansi	-pedantic	tables.c	-o	tables.o
-convert.o:	convert.c	convert.h	tables.h
+convert.o:	convert.c	convert.h	
 	gcc	-c	-Wall	-ansi	-pedantic	convert.c	-o	convert.o
 firstcheck.o:	firstcheck.c	firstcheck.h	
 	gcc	-c	-Wall	-ansi	-pedantic	firstcheck.c	-o	firstcheck.o

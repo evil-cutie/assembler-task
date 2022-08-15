@@ -43,7 +43,22 @@ void printLabelList(labelPT head)
 		printf("\n___label #%d___ \n", ++i); 
 		printf("label: %s\n", head->label);
 		printf("address: %d\n", head->address);
+        if((head->type) == 0)
+            printf("type: data\n");
+        else if ((head->type) == 1)
+            printf("type: code\n");
 		head = head->next;
 	}
 	printf("\n**************** END LABEL TABLE ****************\n");
+}
+
+void freeLabelList(labelPT *head)
+{
+	labelPT temp;
+	while(*head)
+	{
+		temp = *head;
+		*head = (*head)->next;
+		free(temp);
+	}
 }

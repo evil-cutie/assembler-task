@@ -62,7 +62,7 @@ FILE *readAndCreateFile(char *fname, macroPT *head)
 			textptr = buffer;
 			textptr = textptr + strlen("macro"); /* move a pointer to the next word */
 			sscanf(textptr, "%s", name); /* scan next word */
-			if((isCommandName(name) > -1) || (isDirName(name) > -1) || (isRegisterName(name) > -1))
+			if(isCommandName(name) || isDirName(name) || isRegisterName(name))
 			{
 				printf("\nError: macro name cannot be '%s'\n", name);
 				error = TRUE;

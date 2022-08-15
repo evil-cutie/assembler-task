@@ -15,4 +15,5 @@ typedef struct labelLS
 labelPT findLabel(labelPT head, char *name);
 void addLabel(labelPT *head, char *label, int address, short type);
 void printLabelList(labelPT head);
+void freeLabelList(labelPT *head);
 /*************************************************************************************************/
