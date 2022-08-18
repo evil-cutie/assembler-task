@@ -17,10 +17,10 @@ void firstCheck(char *fileName, labelPT *head)
         char **nextword = getNextWord(nextline);
         checkLine(nextword, DC, IC, head); 
     }
+    updateDataAddress(*IC, head);
     printBinary();
     printLabelList(*head);
     freeLabelList(head); 
-   
 }
 
 char **getNextWord(char *line)
@@ -80,6 +80,10 @@ void checkLine(char **line, int *DC, int *IC, labelPT *head)
         }
         else
             printf("\nError: '%s' is illigal command", line[i]);
+    }
+    else
+    {
+        tempIC = decodeCommand(line, 0, tempIC); 
     }
     *DC = tempDC;
     *IC = tempIC;
@@ -207,7 +211,7 @@ int decodeStruct(char **line, int DC)
     DC = decodeString(line[i], DC);
     return DC;
 }
-
+/* decode first line */
 int decodeCommand(char **line, int pos, int IC)
 {
     char *destOp, *sourceOp, *tmp;
@@ -215,7 +219,6 @@ int decodeCommand(char **line, int pos, int IC)
     char *binary = (char*)malloc(sizeof(char)*BITS);
     int L = 0;
     destOp = sourceOp = tmp =  NULL;
-    /* decode first line */
     /* bits 9-6 */
     strcpy(binary, opcode(command));
     /* bits 5-4 */
@@ -336,6 +339,17 @@ int decodeNum(char *op, int IC)
         }
     return L;
 } 
+
+void updateDataAddress(int IC, labelPT *head)
+{
+    labelPT current = *head;
+    while(current)
+    {
+        if(current->type == DATA)
+            current->address = (current->address) + IC;
+        current = current->next;
+    } 
+}
 
 int isLegalOperand(char *command, char *sourceOp, char *destOp)
 {
