@@ -1,7 +1,9 @@
 #include "preprocessor.h"
 #include "ltable.h"
 #include "convert.h"
-#define SIZE 1000
+#define SIZE 100
+#define DATA 0
+#define CODE 1
 
 static char instructions[SIZE][BITS + 1];
 static char data[SIZE][BITS + 1];
@@ -22,4 +24,9 @@ int decodeStruct(char **line, int DC);
 int isLegalLabel(char *label);
 int decodeCommand(char **line, int pos, int IC);
 void printBinary();
+int checkOperands(char *sourceOp, char *destOp, int IC);
+char *registerBin(char *regist);
+int isLegalOperand(char *command, char *sourceOp, char *destOp);
+int decodeNum(char *op, int IC);
+int decodeStructAccess(char *op, int IC);
 /*************************************************************************************************/

@@ -38,6 +38,13 @@ static char binaryOpcode[COMMANDS][5] = {
         "1100", "1101", "1110", "1111"
 };
 
+/* binary register code */
+static char binaryRegister[REGISTERS][5] = {
+        "0000", "0001", "0010", "0011",
+        "0100", "0101", "0110", "0111"
+};
+
+
 /******************************************* functions *******************************************/
 int isCommandName(char * word);
 int isDirName(char * word);

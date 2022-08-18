@@ -1,14 +1,14 @@
-MAIN: mov STR STR
+MAIN: mov #+5, STR
 add r2,STR
 macro m1
 inc K
 mov S1.2 ,r3
 endmacro
 prn #-5
-sub r1, r4
+LOOP: sub S1.2, r4
 m1
 bne LOOP
-END: hlt
+END: hlt 
 STR: .string "abcdef"
 LENGTH: .data 6,-9,15
 K: .data 22

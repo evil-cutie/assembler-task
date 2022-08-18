@@ -10,24 +10,18 @@ void firstCheck(char *fileName, labelPT *head)
     *IC = *DC = 0;
     strncat(fileName, ".am", 3);
     filePointer = fopen(fileName, "r");
-    memset(data, '\0', sizeof(data[0][0]) * SIZE * 10);
-    memset(instructions, '\0', sizeof(instructions[0][0]) * SIZE * 10);
-    
+    memset(data, '\0', sizeof(char) * (BITS+1) * MAX);
+    memset(instructions, '\0', sizeof(char) * (BITS+1) * MAX);
     while(fgets(nextline, MAX, filePointer))
     {
-        
         char **nextword = getNextWord(nextline);
         checkLine(nextword, DC, IC, head); 
-       
-        
     }
     printBinary();
     printLabelList(*head);
-    freeLabelList(head);
+    freeLabelList(head); 
    
 }
-
-
 
 char **getNextWord(char *line)
 {
@@ -53,48 +47,40 @@ void checkLine(char **line, int *DC, int *IC, labelPT *head)
     if (isLabelDef(line[i]))
     {
         char *newLabel = (char*)malloc(sizeof(line[0]));
-        printf("\nfound command: %s, command length: %lu", line[1], strlen(line[1]));
         strncpy(newLabel, line[i], strlen(line[i]) - 1);
-        printf("\nstring %s length: %lu", newLabel,strlen(line[i]) - 1);
-        
         label = TRUE;
         i++;
         if (isDirName(line[i]))
         {
-            if(!findLabel(*head, newLabel) && isLegalLabel(newLabel))
-                addLabel(head, newLabel, tempDC, 0); /* data type = 0 */
+            if(!findLabel(*head, newLabel))
+                addLabel(head, newLabel, tempDC, DATA); 
             else
                 printf("\nError: label %s already exists", newLabel);
             
             if(!strcmp(line[i], validDirectives[2]))    /* string definition */
-            {        
-                printf("\n************** FOUND STRING! Name: %s **************\n", newLabel);                                        
+            {                                              
                 tempDC = decodeString(line[i + 1], tempDC);
-                printf("\ncurrent DC is: %d", tempDC);
             }
             if(!strcmp(line[i], validDirectives[1]))    /* array definition */
             {
-                printf("\n************** FOUND ARRAY! Name: %s **************\n", newLabel); 
                 tempDC = decodeData(line, tempDC);
-                printf("\ncurrent DC is: %d", tempDC);
             }
             if(!strcmp(line[i], validDirectives[0]))    /* struct definition */
             {
-                printf("\n************** FOUND STRUCT! Name: %s **************\n", newLabel);
                 tempDC = decodeStruct(line, tempDC);
-                printf("\ncurrent DC is: %d", tempDC);
             }
         }
-        if(isCommandName(line[i]))
+        else if(isCommandName(line[i]))
         {
             if(!findLabel(*head, newLabel) && isLegalLabel(newLabel))
-                addLabel(head, newLabel, tempIC, 1); 
+                addLabel(head, newLabel, tempIC, CODE); 
             else
                 printf("\nError: label %s already exists", newLabel);
                 tempIC = decodeCommand(line, i, tempIC); 
         }
+        else
+            printf("\nError: '%s' is illigal command", line[i]);
     }
-    
     *DC = tempDC;
     *IC = tempIC;
 } 
@@ -103,40 +89,33 @@ int isLabelDef(char *word)
 {
     char *last = &word[strlen(word) - 1];
     if(!strcmp(last, ":"))
-        return 1;
+    {
+        char *newLabel = (char*)malloc(sizeof(word));
+        strncpy(newLabel, word, strlen(word) - 1);
+        if(isLegalLabel(newLabel))
+            return 1;
+        else
+        {
+            printf("\nError: '%s' is illigal label name", newLabel);
+            return 0;
+        }
+    }
     return 0;
 }
 
 int isLegalLabel(char *label)
 {
     int i = 0;
-    if(strlen(label) > 30)
-    {
-        printf("\nError: label '%s' name must be no longer than 30 characters", label);
-        return -1;
-    }
-    if(!isalpha(label[i]))
-    {
-        printf("\nError: label '%s' name must start with a letter", label);
-        return -1;
-    }
+    if(strlen(label) > 30 || (!isalpha(label[i])) || isCommandName(label) || isDirName(label) || isRegisterName(label))
+        return 0;
     for(i = 1; i < strlen(label); i++)
     {
         if(!isalnum(label[i]))
-        {
-            printf("\nError: label '%s' name must contain only alphanumeric characters", label);
-            return -1;
-        }
-    }
-    if(isCommandName(label) || isDirName(label) || isRegisterName(label))
-    {
-        printf("\nError: label name cannot be '%s'", label);
-        return -1;
+            return 0;
     }
     return 1;
 }
-
-
+/* returns binary code of the opcode */
 char *opcode(char *nextword)
 {
 	int i;
@@ -147,22 +126,33 @@ char *opcode(char *nextword)
 	}
 	return NULL;
 }
-
+/* returns binary code of a given operand */
 char *operand(char *nextword)
 {
 	int i;
 	for(i = 0; i < COMMANDS; i++)
 	{
-		if(!strcmp(nextword, validRegisters[i])) /* register addressing */
+		if(isRegisterName(nextword))    /* register addressing */
 			return "11";
-		if(isLegalLabel(nextword)) /* direct addressing */
+		if(isLegalLabel(nextword))      /* direct addressing */
 			return "01";
-		if(!strcmp(nextword, "#")) /* instant addressing */
+		if(strstr(nextword, "#"))       /* instant addressing */
 			return "00";
         if(strstr(nextword, ".1") || strstr(nextword, ".2"))    /* struct access */
             return "10";
 	}
 	return NULL;
+}
+/* returns binary code of a given register */
+char *registerBin(char *regist)
+{
+    int i;
+    for(i = 0; i < REGISTERS; i++)
+    {
+        if(!strcmp(regist, validRegisters[i]))
+            return binaryRegister[i];
+    }
+    return NULL;
 }
 
 int decodeString(char *string, int DC)
@@ -174,9 +164,7 @@ int decodeString(char *string, int DC)
 	{
         value = *ptr - '0'; /* ascii value of character */
 		binary = decimalToBinary(value);
-		/*printf("\nchar: %c", *ptr);*/
         strcpy(data[DC], binary);
-        /*printf("\nbinary char: %s", data[DC]);*/
         DC++;
         ptr++;
 	}
@@ -192,9 +180,7 @@ int decodeData(char **line, int DC)
     {
         decimal = atoi(line[i]);
         binary = decimalToBinary(decimal); 
-        /*printf("\ndecimal value: %s", line[i]);*/
         strcpy(data[DC], binary);
-        /*printf("\nbinary value: %s", data[DC]); */
         i++;
         DC++;
     }
@@ -211,9 +197,7 @@ int decodeStruct(char **line, int DC)
     {
         decimal = atoi(line[i]);
         binary = decimalToBinary(decimal);
-        printf("\ndecimal value: %d", decimal);
         strcpy(data[DC], binary);
-        printf("\nbinary value: %s", data[DC]); 
         DC++;
         i++;
     }
@@ -226,45 +210,150 @@ int decodeStruct(char **line, int DC)
 
 int decodeCommand(char **line, int pos, int IC)
 {
-    char *destOp = NULL;
-    char *sourceOp = NULL;
-    char *temp = NULL;
-    char *tmp;
+    char *destOp, *sourceOp, *tmp;
     char *command = line[pos];
     char *binary = (char*)malloc(sizeof(char)*BITS);
-    
+    int L = 0;
+    destOp = sourceOp = tmp =  NULL;
+    /* decode first line */
+    /* bits 9-6 */
     strcpy(binary, opcode(command));
-    
+    /* bits 5-4 */
     if((sourceOp = line[pos+1]) && (tmp = operand(sourceOp)))
         strcat(binary, tmp);
     else
         strcat(binary, "00");
-    
+    /* bits 3-2 */
     if((destOp = line[pos+2]) && (tmp = operand(destOp)))
         strcat(binary, tmp);
     else
-        strcat(binary, "00");
-    
+        strcat(binary, "00");   /* A, R, E */
+    /* bits 1-0 */
     strcat(binary, "00");
-    temp = strdup(binary);
-    strcpy(instructions[IC], temp);
-    printf("\n%s  binary code: %s\n", *line, instructions[IC]);
+    strcpy(instructions[IC], binary);
     IC++;
-    return IC;
+    if(isLegalOperand(command, sourceOp, destOp))
+    {
+        L = checkOperands(sourceOp, destOp, IC); 
+    }
+    return (IC + L);
+}
+
+int checkOperands(char *sourceOp, char *destOp, int IC)
+{
+    int L = 0;
+    int diff = 0;
+    char *tempOp1, *tempOp2;
+    char *binary1 = (char*)malloc(sizeof(char)*BITS);
+    char *binary2 = (char*)malloc(sizeof(char)*BITS);
+    tempOp1 = tempOp2 = NULL;
+
+    if(sourceOp)
+    {
+        if ((tempOp1 = registerBin(sourceOp)))      /* source operand is a register */
+        {    
+            strcpy(binary1, tempOp1);
+            if (destOp && (tempOp2 = registerBin(destOp)))     /* both operands are registers */
+            {
+                strcat(binary1, tempOp2);
+                strcat(binary1, "00");   /* A, R, E */
+                strcpy(instructions[IC], binary1);
+                return (L+1);
+            }
+            strcat(binary1, "000000"); 
+            strcpy(instructions[IC], binary1);
+            L++;
+        }
+        if (isLegalLabel(sourceOp))                 /* source operand is a label */
+        {
+            strcpy(instructions[IC], "label");
+            L++;
+        }
+        if ((diff = decodeNum(sourceOp, IC)))       /* source operand is a digit */
+            L = L + diff;
+        if ((diff = decodeStructAccess(sourceOp, IC)))
+            L = L + diff;
+    }
+    if (destOp)
+    {
+        if ((tempOp2 = registerBin(destOp)))        /* destination operand is a register */
+        {
+            strcpy(binary2, "0000");
+            strcat(binary2, tempOp2);
+            strcat(binary2, "00");   /* A, R, E */
+            strcpy(instructions[IC+L], binary2);
+            return (L+1);
+        }
+        if (isLegalLabel(destOp))                   /* destination operand is a label */
+        {
+            strcpy(instructions[IC+L], "label");
+            return (L+1);
+        }
+        if ((diff = decodeNum(destOp, IC+L)))      /* destination operand is a digit */
+            L = L + diff;
+        if ((diff = decodeStructAccess(destOp, IC+L)))
+            L = L + diff;
+    }
+    return L;
+}
+
+int decodeStructAccess(char *op, int IC)
+{
+    int L = 0;
+    char *one = NULL;
+    char *two = NULL;
+    if((one = strstr(op, ".1")) || (two =  strstr(op, ".2"))) 
+    {
+        strcpy(instructions[IC], "struct");
+        L++;
+        if(one)     /* access to first field */
+        {
+            strcpy(instructions[IC+L], "0000000100");
+            return (L+1);
+        }
+        strcpy(instructions[IC+L], "0000001000");       /* access to second field */
+        return (L+1);
+    }
+    return L;
+}
+
+int decodeNum(char *op, int IC)
+{
+    int L = 0;
+    char *binary = (char*)malloc(sizeof(char)*BITS);
+     if (!strcmp(operand(op), "00"))       
+        {
+            int num = 0;
+            char *temp = (char*)malloc(sizeof(op));
+            char *binaryNum = (char*)malloc(sizeof(char)*BITS);
+            strcpy(temp, &op[1]);
+            num = atoi(temp);
+            binaryNum = decimalToBinary(num);
+            strcpy(binary, &binaryNum[2]);
+            strcat(binary, "00");
+            strcpy(instructions[IC], binary);
+            return (L+1);
+        }
+    return L;
+} 
+
+int isLegalOperand(char *command, char *sourceOp, char *destOp)
+{
+    return 1;
 }
 
 void printBinary()
 {
-    int i;
+    int i, j;
     printf("\n***************** INSTRUCTIONS LIST *****************\n");
-    for(i = 0; i < 5; i++)
+    for(i = 0; strcmp(instructions[i], "\0"); i++)
     {
-        printf("\naddress: %d\t\tcommand: %s", i, instructions[i]);
+        printf("\naddress: %d\t\tcommand: %s", i+100, instructions[i]);
     }
     printf("\n***************** DATA LIST *****************\n");
-    for(i = 0; i < 5; i++)
+    for(j = 0; strcmp(data[j], "\0"); j++)
     {
-        printf("\naddress: %d\t\tcommand: %s", i, data[i]);
+        printf("\naddress: %d\t\tcommand: %s", j+i+100, data[j]);
     }
 }
 
