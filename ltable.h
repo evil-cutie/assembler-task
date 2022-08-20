@@ -7,7 +7,7 @@ typedef struct labelLS
 {
     char *label;
     int address;                   /* in decimal */
-    short type;                    /* data = 0, code = 1 */
+    short type;                    /* data = 0, code = 1, extern = 3 */
     labelPT next;
 }labelLS;
 

@@ -44,44 +44,40 @@ void checkLine(char **line, int *DC, int *IC, labelPT *head)
     int tempIC = *IC;
     int tempDC = *DC;
     int i = 0;
-    if (isLabelDef(line[i]))
+    if(isLabelDef(line[i]))
     {
         char *newLabel = (char*)malloc(sizeof(line[0]));
         strncpy(newLabel, line[i], strlen(line[i]) - 1);
-        label = TRUE;
         i++;
-        if (isDirName(line[i]))
+        if(isDirName(line[i]))
         {
             if(!findLabel(*head, newLabel))
                 addLabel(head, newLabel, tempDC, DATA); 
             else
-                printf("\nError: label %s already exists", newLabel);
+                printf("\nError: label '%s' already exists", newLabel);
             
-            if(!strcmp(line[i], validDirectives[2]))    /* string definition */
-            {                                              
+            if(!strcmp(line[i], validDirectives[2]))            /* string definition */
                 tempDC = decodeString(line[i + 1], tempDC);
-            }
-            if(!strcmp(line[i], validDirectives[1]))    /* array definition */
-            {
+            
+            if(!strcmp(line[i], validDirectives[1]))            /* array definition */
                 tempDC = decodeData(line, tempDC);
-            }
-            if(!strcmp(line[i], validDirectives[0]))    /* struct definition */
-            {
+            
+            if(!strcmp(line[i], validDirectives[0]))            /* struct definition */
                 tempDC = decodeStruct(line, tempDC);
-            }
         }
         else if(isCommandName(line[i]))
         {
-            if(!findLabel(*head, newLabel) && isLegalLabel(newLabel))
+            if (!findLabel(*head, newLabel))
                 addLabel(head, newLabel, tempIC, CODE); 
             else
-                printf("\nError: label %s already exists", newLabel);
-                tempIC = decodeCommand(line, i, tempIC); 
+                printf("\nError: label '%s' already exists", newLabel);
+            
+            tempIC = decodeCommand(line, i, tempIC); 
         }
         else
             printf("\nError: '%s' is illigal command", line[i]);
     }
-    else
+    else if(isCommandName(line[i]))
     {
         tempIC = decodeCommand(line, 0, tempIC); 
     }
@@ -110,7 +106,7 @@ int isLabelDef(char *word)
 int isLegalLabel(char *label)
 {
     int i = 0;
-    if(strlen(label) > 30 || (!isalpha(label[i])) || isCommandName(label) || isDirName(label) || isRegisterName(label))
+    if(strlen(label) > 30 || (!isalpha(label[i])) || isReservedWord(label))
         return 0;
     for(i = 1; i < strlen(label); i++)
     {

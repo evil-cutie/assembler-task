@@ -6,9 +6,10 @@ int main(int argc, char *argv[])
 	for (i = 1; i < argc; i++)
 	{	
 		macroPT head = NULL;
-		labelPT lhead = NULL;
+		labelPT labelHead = NULL;
 		readAndCreateFile(argv[i], &head); 
 		freeList(&head);
-		firstCheck(argv[i], &lhead);
+		if(error == FALSE)
+			firstCheck(argv[i], &labelHead);
 	}
 }

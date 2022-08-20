@@ -1,6 +1,6 @@
 MAIN: mov #+5, STR
 add r2,STR
-macro m1
+macro r1
 inc K
 mov S1.2 ,r3
 endmacro

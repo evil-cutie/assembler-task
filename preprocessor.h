@@ -14,7 +14,7 @@ typedef struct macroLS {
 	macroPT next;
 } macroLS;
 /******************************************* functions *******************************************/
-FILE *readAndCreateFile(char *fname, macroPT *head);
+void readAndCreateFile(char *fname, macroPT *head);
 void addMacro(macroPT *head, char *name, char *string);
 macroPT findMacro(macroPT head, char *name);
 void printList(macroPT head);

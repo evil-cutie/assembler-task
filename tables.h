@@ -5,9 +5,11 @@
 #define COMMANDS 16
 #define DIRECTIVES 3
 #define REGISTERS 8
+#define SIZE 10
+#define WORDS 4
 
 /* valid command names */
-static char validCommands[COMMANDS][4] = {
+static char validCommands[COMMANDS][SIZE] = {
         "mov", "cmp", "add", "sub",
         "not", "clr", "lea", "inc",
         "dec", "jmp", "bne", "get",
@@ -21,17 +23,17 @@ static char validRegisters[REGISTERS][3] = {
 };
 
 /* other reserved words */
-static char other[MAX][MAX] = {
-        "macro", "endmacro"
+static char reservedOther[WORDS][SIZE] = {
+        "macro", "endmacro", ".entry", ".extern"
 };
 
 /* valid directive names */
-static char validDirectives[DIRECTIVES][10] = {
+static char validDirectives[DIRECTIVES][SIZE] = {
         ".struct", ".data", ".string"
 };
 
 /* binary command code */
-static char binaryOpcode[COMMANDS][5] = {
+static char binaryOpcode[COMMANDS][SIZE] = {
         "0000", "0001", "0010", "0011",
         "0100", "0101", "0110", "0111",
         "1000", "1001", "1010", "1011",
@@ -39,14 +41,15 @@ static char binaryOpcode[COMMANDS][5] = {
 };
 
 /* binary register code */
-static char binaryRegister[REGISTERS][5] = {
+static char binaryRegister[REGISTERS][SIZE] = {
         "0000", "0001", "0010", "0011",
         "0100", "0101", "0110", "0111"
 };
 
 
 /******************************************* functions *******************************************/
-int isCommandName(char * word);
-int isDirName(char * word);
-int isRegisterName(char * word);
+int isCommandName(char *word);
+int isDirName(char *word);
+int isRegisterName(char *word);
+int isReservedWord(char *word);
 /*************************************************************************************************/

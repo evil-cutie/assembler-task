@@ -1,13 +1,13 @@
 #include "preprocessor.h"
 #include "ltable.h"
 #include "convert.h"
-#define SIZE 100
+#define ROWS 100
 #define DATA 0
 #define CODE 1
 #define EXTERN 2
 
-static char instructions[SIZE][BITS + 1];
-static char data[SIZE][BITS + 1];
+static char instructions[ROWS][BITS + 1];
+static char data[ROWS][BITS + 1];
 
 enum boolean label;
 enum boolean compilationError;
