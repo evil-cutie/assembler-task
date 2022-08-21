@@ -17,7 +17,7 @@ static char validCommands[COMMANDS][SIZE] = {
 };
 
 /* valid register names */
-static char validRegisters[REGISTERS][3] = {
+static char validRegisters[REGISTERS][SIZE] = {
         "r0", "r1", "r2", "r3",
         "r4", "r5", "r6", "r7"
 };

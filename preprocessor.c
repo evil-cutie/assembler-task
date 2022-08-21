@@ -13,6 +13,8 @@ void readAndCreateFile(char *fname, macroPT *head)
 	value = name = textptr = firstWord = NULL;
 	newMacro = FALSE;
 	error = FALSE;
+	memset(fnameAm, '\0', MAX);
+	memset(fnameAs, '\0', MAX);
 	strcpy(fnameAm, fname);
 	strcpy(fnameAs, fname);
 	strncat(fnameAm, ".am", 3); /* filename.am */

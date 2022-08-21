@@ -1,20 +1,23 @@
 #include "firstcheck.h"
 #include "tables.h"
 
-void firstCheck(char *fileName, labelPT *head)
+void firstCheck(char *fname, labelPT *head)
 {
     FILE *filePointer;
-    char nextline[MAX];
+    char nextline[MAX], fileName[MAX];
     char **nextword;
     int *IC = (int*)malloc(sizeof(int));
     int *DC = (int*)malloc(sizeof(int));
     int lineCount = 1;
     *IC = *DC = 0;
     compilationError = FALSE;
-    strncat(fileName, ".am", 3);
-    filePointer = fopen(fileName, "r");
+    memset(fileName, '\0', MAX);
     memset(data, '\0', sizeof(char) * (BITS+1) * MAX);
     memset(instructions, '\0', sizeof(char) * (BITS+1) * MAX);
+    strcpy(fileName, fname);
+    strncat(fileName, ".am", 3);
+    filePointer = fopen(fileName, "r");
+
     while(fgets(nextline, MAX, filePointer))
     {
         if(nextline[0] != ';')               /* skip comment */
@@ -24,7 +27,8 @@ void firstCheck(char *fileName, labelPT *head)
         }
         lineCount++;
     }
-    updateDataAddress(*IC, head);
+    if(compilationError == FALSE)
+        updateDataAddress(*IC, head);
     printBinary();
     printLabelList(*head);
 }
