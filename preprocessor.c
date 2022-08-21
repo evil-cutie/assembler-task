@@ -4,7 +4,7 @@
 /* read .as file and create .am file with macro expansion */
 void readAndCreateFile(char *fname, macroPT *head)
 {
-	FILE *fpSource; /*pointer to a source file */
+	FILE *fpSource; /* pointer to a source file */
 	FILE *fpAm; /* pointer to ".am" file */
 	macroPT foundMacro = NULL;
 	char *firstWord, *name, *textptr, *value;

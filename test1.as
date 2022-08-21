@@ -1,14 +1,17 @@
-MAIN: mov #+5, STR
+; file ps.as
+.entry LOOP
+.entry LENGTH
+.extern L3
+.extern W
+MAIN: mov S1.1, W
 add r2,STR
-macro r1
-inc K
-mov S1.2 ,r3
-endmacro
+LOOP: jmp W
 prn #-5
-LOOP: sub S1.2, r4
-m1
-bne LOOP
-END: hlt 
+sub r1, r4
+inc K
+mov S1.2, r3
+bne L3
+END: hlt
 STR: .string "abcdef"
 LENGTH: .data 6,-9,15
 K: .data 22

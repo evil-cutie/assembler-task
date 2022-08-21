@@ -5,22 +5,28 @@ void firstCheck(char *fileName, labelPT *head)
 {
     FILE *filePointer;
     char nextline[MAX];
+    char **nextword;
     int *IC = (int*)malloc(sizeof(int));
     int *DC = (int*)malloc(sizeof(int));
+    int lineCount = 1;
     *IC = *DC = 0;
+    compilationError = FALSE;
     strncat(fileName, ".am", 3);
     filePointer = fopen(fileName, "r");
     memset(data, '\0', sizeof(char) * (BITS+1) * MAX);
     memset(instructions, '\0', sizeof(char) * (BITS+1) * MAX);
     while(fgets(nextline, MAX, filePointer))
     {
-        char **nextword = getNextWord(nextline);
-        checkLine(nextword, DC, IC, head); 
+        if(nextline[0] != ';')               /* skip comment */
+        {
+            nextword = getNextWord(nextline);                
+            checkLine(nextword, DC, IC, head, lineCount); 
+        }
+        lineCount++;
     }
     updateDataAddress(*IC, head);
     printBinary();
     printLabelList(*head);
-    freeLabelList(head); 
 }
 
 char **getNextWord(char *line)
@@ -39,53 +45,100 @@ char **getNextWord(char *line)
     return nextword;
 }
 
-void checkLine(char **line, int *DC, int *IC, labelPT *head)
+void checkLine(char **line, int *DC, int *IC, labelPT *head, int lineCount)
 {
     int tempIC = *IC;
     int tempDC = *DC;
-    int i = 0;
-    if(isLabelDef(line[i]))
+    int pos = 0;
+    if(isLabelDef(line[pos], lineCount))
     {
         char *newLabel = (char*)malloc(sizeof(line[0]));
-        strncpy(newLabel, line[i], strlen(line[i]) - 1);
-        i++;
-        if(isDirName(line[i]))
+        strncpy(newLabel, line[pos], strlen(line[pos]) - 1);
+        pos++;
+        if(isDirName(line[pos]))
         {
-            if(!findLabel(*head, newLabel))
-                addLabel(head, newLabel, tempDC, DATA); 
-            else
-                printf("\nError: label '%s' already exists", newLabel);
-            
-            if(!strcmp(line[i], validDirectives[2]))            /* string definition */
-                tempDC = decodeString(line[i + 1], tempDC);
-            
-            if(!strcmp(line[i], validDirectives[1]))            /* array definition */
-                tempDC = decodeData(line, tempDC);
-            
-            if(!strcmp(line[i], validDirectives[0]))            /* struct definition */
-                tempDC = decodeStruct(line, tempDC);
+            addToTable(newLabel, head, tempDC, DATA, lineCount);
+            tempDC = defineNewData(line, head, tempDC, lineCount, pos);
         }
-        else if(isCommandName(line[i]))
+        else 
         {
-            if (!findLabel(*head, newLabel))
-                addLabel(head, newLabel, tempIC, CODE); 
+            if(searchEntryOrExtern(line, head, pos, lineCount))
+                ;
+            else if(isCommandName(line[pos]))
+            {
+                addToTable(newLabel, head, tempIC, CODE, lineCount); 
+                tempIC = decodeCommand(line, pos, tempIC); 
+            }
             else
-                printf("\nError: label '%s' already exists", newLabel);
-            
-            tempIC = decodeCommand(line, i, tempIC); 
+            {
+                printf("\nError: '%s' is illigal command ==> line %d", line[pos], lineCount);
+                compilationError = TRUE;
+            }
         }
-        else
-            printf("\nError: '%s' is illigal command", line[i]);
-    }
-    else if(isCommandName(line[i]))
+    }    
+    else 
     {
-        tempIC = decodeCommand(line, 0, tempIC); 
+        if(searchEntryOrExtern(line, head, pos, lineCount))
+            ;
+        else if(isCommandName(line[pos]))
+            tempIC = decodeCommand(line, 0, tempIC); 
+        else
+        {
+            printf("\nError: '%s' is illigal command ==> line %d", line[pos], lineCount);
+            compilationError = TRUE;
+        }
     }
     *DC = tempDC;
     *IC = tempIC;
 } 
 
-int isLabelDef(char *word)
+void addToTable(char *newLabel, labelPT *head, int value, int type, int lineCount)
+{
+    if (!findLabel(*head, newLabel))
+        addLabel(head, newLabel, value, type); 
+    else
+    {
+        printf("\nError: label '%s' already exists ==> line %d", newLabel, lineCount);
+        compilationError = TRUE;
+    }
+}
+
+int defineNewData(char **line, labelPT *head, int DC, int lineCount, int pos)
+{
+    if(!strcmp(line[pos], validDirectives[2]))            /* string definition */
+        DC = decodeString(line[pos + 1], DC);
+            
+    if(!strcmp(line[pos], validDirectives[1]))            /* array definition */
+        DC = decodeData(line, DC);
+            
+    if(!strcmp(line[pos], validDirectives[0]))            /* struct definition */
+        DC = decodeStruct(line, DC, lineCount);
+    return DC;
+}
+
+int searchEntryOrExtern(char **line, labelPT *head, int pos, int lineCount)
+{
+    char *newLabel = (char*)malloc(sizeof(char) * MAX);
+    if(!strcmp(line[pos], ".entry"))
+        return 1;
+    if(!strcmp(line[pos], ".extern"))
+    {
+        pos++;
+        while(line[pos])
+        {
+            strcpy(newLabel, line[pos]);
+            if(isLegalLabel(newLabel))
+                addLabel(head, newLabel, '\0', EXTERN); 
+            else
+                printf("\nError: label name '%s' is illigal ==> line %d", newLabel, lineCount);
+            pos++;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+int isLabelDef(char *word, int lineCount)
 {
     char *last = &word[strlen(word) - 1];
     if(!strcmp(last, ":"))
@@ -96,7 +149,8 @@ int isLabelDef(char *word)
             return 1;
         else
         {
-            printf("\nError: '%s' is illigal label name", newLabel);
+            printf("\nError: '%s' is illigal label name ==> line %d", newLabel, lineCount);
+            compilationError = TRUE;
             return 0;
         }
     }
@@ -168,6 +222,8 @@ int decodeString(char *string, int DC)
         DC++;
         ptr++;
 	}
+    strcpy(data[DC], "0000000000"); /* end of string */
+    DC++;
     return DC;
 }
 
@@ -187,7 +243,7 @@ int decodeData(char **line, int DC)
     return DC;
 }
 
-int decodeStruct(char **line, int DC)
+int decodeStruct(char **line, int DC, int lineCount)
 {
     int decimal;
     char *binary = (char*)malloc(sizeof(int)*BITS);
@@ -202,7 +258,7 @@ int decodeStruct(char **line, int DC)
         i++;
     }
     else
-        printf("\nError: invalid struct definition, first field must be integer");
+        printf("\nError: invalid struct definition, first field must be integer ==> line %d", lineCount);
     
     DC = decodeString(line[i], DC);
     return DC;
@@ -210,20 +266,28 @@ int decodeStruct(char **line, int DC)
 /* decode first line */
 int decodeCommand(char **line, int pos, int IC)
 {
-    char *destOp, *sourceOp, *tmp;
-    char *command = line[pos];
+    char *destOp, *sourceOp, *tmp, *command;
     char *binary = (char*)malloc(sizeof(char)*BITS);
     int L = 0;
-    destOp = sourceOp = tmp =  NULL;
+    tmp =  NULL;
+    command = line[pos];
+    sourceOp = line[pos+1];
+    destOp = line[pos+2];
+    
+    if(!destOp)
+    {
+        destOp = sourceOp;
+        sourceOp = NULL;
+    }
     /* bits 9-6 */
     strcpy(binary, opcode(command));
     /* bits 5-4 */
-    if((sourceOp = line[pos+1]) && (tmp = operand(sourceOp)))
+    if(sourceOp && (tmp = operand(sourceOp)))
         strcat(binary, tmp);
     else
         strcat(binary, "00");
     /* bits 3-2 */
-    if((destOp = line[pos+2]) && (tmp = operand(destOp)))
+    if(destOp && (tmp = operand(destOp)))
         strcat(binary, tmp);
     else
         strcat(binary, "00");   /* A, R, E */
