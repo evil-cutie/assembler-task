@@ -20,10 +20,11 @@ void firstCheck(char *fname, labelPT *head)
 
     while(fgets(nextline, MAX, filePointer))
     {
-        if(nextline[0] != ';')               /* skip comment */
+        if(nextline[0] != ';')                       /* skip comment */
         {
-            nextword = getNextWord(nextline);                
-            checkLine(nextword, DC, IC, head, lineCount); 
+            nextword = getNextWord(nextline);   
+            if(nextword[0])                          /* skip empty line */
+                checkLine(nextword, DC, IC, head, lineCount); 
         }
         lineCount++;
     }
@@ -31,6 +32,8 @@ void firstCheck(char *fname, labelPT *head)
         updateDataAddress(*IC, head);
     printBinary();
     printLabelList(*head);
+    rewind(filePointer);
+    fclose(filePointer);
 }
 
 char **getNextWord(char *line)
