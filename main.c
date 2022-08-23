@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 		freeList(&macroHead);
 		if(error == FALSE)
 			DC = firstCheck(argv[i], &labelHead);
-		if(compilationError == FALSE)
+		if(compilationError == FALSE && error == FALSE)
 			secondcheck(argv[i], &labelHead, &externalHead, DC);
 	}
 }

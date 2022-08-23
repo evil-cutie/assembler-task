@@ -22,10 +22,16 @@ void readAndCreateFile(char *fname, macroPT *head)
 	
 	fpSource = fopen(fnameAs, "r");
 	if(!fpSource)
-		printf("Error: cannot open a file '%s' \n", fnameAs);
+	{
+		printf("\nError: cannot open a file '%s' ", fnameAs);
+		return ;
+	}
 	fpAm = fopen(fnameAm, "w");
 	if(!fpAm)
-		printf("Error: cannot create a file '%s' \n", fnameAm);
+	{
+		printf("\nError: cannot create a file '%s' ", fnameAm);
+		return ;
+	}
 	/* memory allocation for pointers */
 	textptr = (char*)malloc(sizeof(char)*MAX);
 	firstWord = (char*)malloc(sizeof(char)*MAX);
