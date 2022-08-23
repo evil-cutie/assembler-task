@@ -65,7 +65,10 @@ int secondCheckLine(char **line, int IC, labelPT *head, labelPT *externalHead, i
                 printf("\nError: '%s' cannot be .entry and .extern in th same file ==> line %d", line[pos+1], lineCount);
         }
         else
+        {   
             printf("\nError: entry '%s' not found ==> line %d", line[pos+1], lineCount);
+            compilationError = TRUE;
+        }
         return IC;
     }
     /* check if there's missing binary code in a command */

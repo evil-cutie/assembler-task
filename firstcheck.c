@@ -496,6 +496,11 @@ int isLegalOperand(char *command, char *sourceOp, char *destOp, int lineCount)
     col = 0;
     if(destOp == NULL && legalDestOperands[row][col] == NULL)
         destError = 0;
+    if(destOp == NULL && legalDestOperands[row][col] != NULL)
+    {
+         printf("\nError: destination operand is missing ==> line %d", lineCount);
+         return 1;
+    }
     for(col = 0; legalDestOperands[row][col] != NULL; col++)
     {
         if(!strcmp(destOp, legalDestOperands[row][col]))
@@ -507,6 +512,11 @@ int isLegalOperand(char *command, char *sourceOp, char *destOp, int lineCount)
     col = 0;
     if(sourceOp == NULL && legalSourceOperands[row][col] == NULL)
         sourceError = 0;
+    if(sourceOp == NULL && legalSourceOperands[row][col] != NULL)
+    {
+         printf("\nError: source operand is missing ==> line %d", lineCount);
+         return 1;
+    }
     for(col = 0; legalSourceOperands[row][col] != NULL; col++)
     {
         if(!strcmp(sourceOp, legalSourceOperands[row][col]))

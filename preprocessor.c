@@ -45,17 +45,17 @@ void readAndCreateFile(char *fname, macroPT *head)
 		{
 			if(strcmp(firstWord, "endmacro")) /* macro definition is still in progress */
 			{
-			strcat(value, buffer);
-			value = (char*)realloc(value, sizeof(char)*MAX*i++);
-			if(!value)
-				printf("Memory allocation error: cannot allocate memory for %p\n",(void*)value);
+				strcat(value, buffer);
+				value = (char*)realloc(value, sizeof(char)*MAX*i++);
+				if(!value)
+					printf("Memory allocation error: cannot allocate memory for %p\n",(void*)value);
 			}
 			else
 			{
-			newMacro = FALSE;
-			addMacro(head, name, value);
-			free(value); /* free the memory for next macro value */
-			memset(buffer, '\0', MAX);
+				newMacro = FALSE;
+				addMacro(head, name, value);
+				free(value); /* free the memory for next macro value */
+				memset(buffer, '\0', MAX);
 			}
 		}
 		if(!strcmp(firstWord, "macro")) /* found new macro definition */
@@ -75,13 +75,13 @@ void readAndCreateFile(char *fname, macroPT *head)
 		if(!newMacro)
 			fputs(buffer, fpAm); /* copy a line of code which is not macro definition to .am file */
 	}
-	fclose(fpSource);
-	rewind(fpAm);
-	if(error) 
+	fclose(fpAm);
+    if(error) 
 	{
 		remove(fnameAm);
 		printf("\nfile '%s' removed due to compilation error", fnameAm);
 	}
+	fclose(fpSource);
 }
 /* add new macro to list */
 void addMacro(macroPT *head, char *name, char *string)
