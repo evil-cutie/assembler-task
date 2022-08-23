@@ -27,12 +27,24 @@ char *binaryTo32(char *binary)
 /* convert decimal to base 32 */
 char *decimalTo32(int num)
 {
-	char *temp; 
-	char *base32 = (char*)malloc(sizeof(char)*2);
+	int quotient, i, end;
+	char temp;
+	char *base32 = (char*)malloc(sizeof(char)*3);
 	if(!base32)
 		printf("\nError: cannot allocate memory for %p",(void*)base32);
-	temp = decimalToBinary(num);
-	base32 = binaryTo32(temp);
+	for(i = 0; num; i++)
+	{
+		quotient = num%32;
+		num = num/32;
+		base32[i] = base32chars[quotient];
+	}
+	end = strlen(base32);
+	for(i = 0; i < end/2; i++)
+	{
+		temp = base32[end - i - 1];
+		base32[end - i - 1] = base32[i];
+		base32[i] = temp;
+	}
 	return base32;
 }
 /* convert decimal to binary */
@@ -45,7 +57,7 @@ char *decimalToBinary(int num)
 	memset(binaryNum, '0', BITS);	
 	for(i = 0; absnum > 0; i++)    
 	{    
-		binaryNum[i]= absnum % 2 + '0';    
+		binaryNum[i] = absnum % 2 + '0';    
 		absnum = absnum/2;    
 	} 
 	/* need to reverse binary number to get its true value */

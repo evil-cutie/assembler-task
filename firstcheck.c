@@ -1,7 +1,10 @@
 #include "firstcheck.h"
 #include "tables.h"
 
-void firstCheck(char *fname, labelPT *head)
+char instructions[ROWS][BITS + 1];
+char data[ROWS][BITS + 1];
+
+int firstCheck(char *fname, labelPT *head)
 {
     FILE *filePointer;
     char nextline[MAX], fileName[MAX];
@@ -30,10 +33,10 @@ void firstCheck(char *fname, labelPT *head)
     }
     if(compilationError == FALSE)
         updateDataAddress(*IC, head);
-    printBinary();
-    printLabelList(*head);
+    
     rewind(filePointer);
     fclose(filePointer);
+    return *DC;
 }
 
 char **getNextWord(char *line)
@@ -101,7 +104,7 @@ void checkLine(char **line, int *DC, int *IC, labelPT *head, int lineCount)
 
 void addToTable(char *newLabel, labelPT *head, int value, int type, int lineCount)
 {
-    if (!findLabel(*head, newLabel))
+    if (!findLabel(head, newLabel))
         addLabel(head, newLabel, value, type); 
     else
     {
@@ -127,7 +130,7 @@ int searchEntryOrExtern(char **line, labelPT *head, int pos, int lineCount)
 {
     char *newLabel = (char*)malloc(sizeof(char) * MAX);
     if(!strcmp(line[pos], ".entry"))
-        return 1;
+        return ENTRY;
     if(!strcmp(line[pos], ".extern"))
     {
         pos++;
@@ -140,7 +143,7 @@ int searchEntryOrExtern(char **line, labelPT *head, int pos, int lineCount)
                 printf("\nError: label name '%s' is illigal ==> line %d", newLabel, lineCount);
             pos++;
         }
-        return 1;
+        return EXTERN;
     }
     return 0;
 }
@@ -218,13 +221,11 @@ char *registerBin(char *regist)
 
 int decodeString(char *string, int DC)
 {
-	int value;
 	char *binary = (char*)malloc(sizeof(int)*BITS);
-	char *ptr = string + 1;
+	char *ptr = &string[1];
 	while(*ptr && *ptr != '"')
 	{
-        value = *ptr - '0'; /* ascii value of character */
-		binary = decimalToBinary(value);
+        binary = decimalToBinary(*ptr);
         strcpy(data[DC], binary);
         DC++;
         ptr++;
@@ -320,10 +321,10 @@ int checkOperands(char *sourceOp, char *destOp, int IC)
 
     if(sourceOp)
     {
-        if ((tempOp1 = registerBin(sourceOp)))      /* source operand is a register */
+        if((tempOp1 = registerBin(sourceOp)))      /* source operand is a register */
         {    
             strcpy(binary1, tempOp1);
-            if (destOp && (tempOp2 = registerBin(destOp)))     /* both operands are registers */
+            if(destOp && (tempOp2 = registerBin(destOp)))     /* both operands are registers */
             {
                 strcat(binary1, tempOp2);
                 strcat(binary1, "00");   /* A, R, E */
@@ -334,19 +335,18 @@ int checkOperands(char *sourceOp, char *destOp, int IC)
             strcpy(instructions[IC], binary1);
             L++;
         }
-        if (isLegalLabel(sourceOp))                 /* source operand is a label */
+        if(isLegalLabel(sourceOp))                 /* source operand is a label */
         {
-            strcpy(instructions[IC], "label");
             L++;
         }
-        if ((diff = decodeNum(sourceOp, IC)))       /* source operand is a digit */
+        if((diff = decodeNum(sourceOp, IC)))       /* source operand is a digit */
             L = L + diff;
-        if ((diff = decodeStructAccess(sourceOp, IC)))
+        if((diff = decodeStructAccess(sourceOp, IC)))
             L = L + diff;
     }
-    if (destOp)
+    if(destOp)
     {
-        if ((tempOp2 = registerBin(destOp)))        /* destination operand is a register */
+        if((tempOp2 = registerBin(destOp)))        /* destination operand is a register */
         {
             strcpy(binary2, "0000");
             strcat(binary2, tempOp2);
@@ -354,14 +354,13 @@ int checkOperands(char *sourceOp, char *destOp, int IC)
             strcpy(instructions[IC+L], binary2);
             return (L+1);
         }
-        if (isLegalLabel(destOp))                   /* destination operand is a label */
+        if(isLegalLabel(destOp))                   /* destination operand is a label */
         {
-            strcpy(instructions[IC+L], "label");
             return (L+1);
         }
-        if ((diff = decodeNum(destOp, IC+L)))      /* destination operand is a digit */
+        if((diff = decodeNum(destOp, IC+L)))      /* destination operand is a digit */
             L = L + diff;
-        if ((diff = decodeStructAccess(destOp, IC+L)))
+        if((diff = decodeStructAccess(destOp, IC+L)))
             L = L + diff;
     }
     return L;
@@ -374,7 +373,6 @@ int decodeStructAccess(char *op, int IC)
     char *two = NULL;
     if((one = strstr(op, ".1")) || (two =  strstr(op, ".2"))) 
     {
-        strcpy(instructions[IC], "struct");
         L++;
         if(one)     /* access to first field */
         {
@@ -391,19 +389,19 @@ int decodeNum(char *op, int IC)
 {
     int L = 0;
     char *binary = (char*)malloc(sizeof(char)*BITS);
-     if (!strcmp(operand(op), "00"))       
-        {
-            int num = 0;
-            char *temp = (char*)malloc(sizeof(op));
-            char *binaryNum = (char*)malloc(sizeof(char)*BITS);
-            strcpy(temp, &op[1]);
-            num = atoi(temp);
-            binaryNum = decimalToBinary(num);
-            strcpy(binary, &binaryNum[2]);
-            strcat(binary, "00");
-            strcpy(instructions[IC], binary);
-            return (L+1);
-        }
+    if (!strcmp(operand(op), "00"))       
+    {
+        int num = 0;
+        char *temp = (char*)malloc(sizeof(op));
+        char *binaryNum = (char*)malloc(sizeof(char)*BITS);
+        strcpy(temp, &op[1]);
+        num = atoi(temp);
+        binaryNum = decimalToBinary(num);
+        strcpy(binary, &binaryNum[2]);
+        strcat(binary, "00");
+        strcpy(instructions[IC], binary);
+        return (L+1);
+    }
     return L;
 } 
 
@@ -423,18 +421,4 @@ int isLegalOperand(char *command, char *sourceOp, char *destOp)
     return 1;
 }
 
-void printBinary()
-{
-    int i, j;
-    printf("\n***************** INSTRUCTIONS LIST *****************\n");
-    for(i = 0; strcmp(instructions[i], "\0"); i++)
-    {
-        printf("\naddress: %d\t\tcommand: %s", i+100, instructions[i]);
-    }
-    printf("\n***************** DATA LIST *****************\n");
-    for(j = 0; strcmp(data[j], "\0"); j++)
-    {
-        printf("\naddress: %d\t\tcommand: %s", j+i+100, data[j]);
-    }
-}
 

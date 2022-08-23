@@ -9,7 +9,6 @@ endmacro
 prn #-5
 sub r1, r4
 m1
-bne LOOP
 END: hlt
 STR: .string "abcdef"
 LENGTH: .data 6,-9,15

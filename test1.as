@@ -1,4 +1,5 @@
 ; file ps.as
+
 .entry LOOP
 .entry LENGTH
 .extern L3
@@ -15,4 +16,4 @@ END: hlt
 STR: .string "abcdef"
 LENGTH: .data 6,-9,15
 K: .data 22
-S1: .struct 8, "abcde"
+S1: .struct 8, "ab"

@@ -1,8 +1,8 @@
-assembler:	preprocessor.o main.o tables.o	convert.o	firstcheck.o	ltable.o
-	gcc	-g	-Wall	-ansi	-pedantic	preprocessor.o	main.o	tables.o	convert.o	ltable.o	firstcheck.o	-o	assembler
+assembler:	preprocessor.o main.o tables.o	convert.o	firstcheck.o	ltable.o	secondcheck.o
+	gcc	-g	-Wall	-ansi	-pedantic	preprocessor.o	main.o	tables.o	convert.o	ltable.o	firstcheck.o	secondcheck.o	-o	assembler
 preprocessor.o: preprocessor.c preprocessor.h 
 	gcc	-c	-Wall	-ansi	-pedantic	preprocessor.c	-o	preprocessor.o
-main.o: main.c firstcheck.h
+main.o: main.c secondcheck.h
 	gcc	-c	-Wall	-ansi	-pedantic	main.c	-o	main.o
 tables.o: tables.c tables.h 
 	gcc	-c	-Wall	-ansi	-pedantic	tables.c	-o	tables.o
@@ -12,3 +12,5 @@ firstcheck.o:	firstcheck.c	firstcheck.h
 	gcc	-c	-Wall	-ansi	-pedantic	firstcheck.c	-o	firstcheck.o
 ltable.o: ltable.c	ltable.h
 	gcc	-c	-Wall	-ansi	-pedantic	ltable.c	-o	ltable.o
+secondcheck.o:	secondcheck.c	secondcheck.h
+	gcc	-c	-Wall	-ansi	-pedantic	secondcheck.c	-o	secondcheck.o

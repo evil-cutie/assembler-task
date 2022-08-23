@@ -5,13 +5,14 @@
 #define DATA 0
 #define CODE 1
 #define EXTERN 2
+#define ENTRY 3
 
-static char instructions[ROWS][BITS + 1];
-static char data[ROWS][BITS + 1];
+extern char instructions[ROWS][BITS + 1];
+extern char data[ROWS][BITS + 1];
 enum boolean compilationError;
 
 /******************************************* functions *******************************************/
-void firstCheck(char *filename, labelPT *head);
+int firstCheck(char *filename, labelPT *head);
 char **getNextWord(char *line);
 void checkLine(char **nextword, int *DC, int *IC, labelPT *head, int lineCount);
 int isLabelDef(char *word, int lineCount);
@@ -22,7 +23,6 @@ int decodeData(char **line, int DC);
 int decodeStruct(char **line, int DC, int lineCount);
 int isLegalLabel(char *label);
 int decodeCommand(char **line, int pos, int IC);
-void printBinary();
 int checkOperands(char *sourceOp, char *destOp, int IC);
 char *registerBin(char *regist);
 int isLegalOperand(char *command, char *sourceOp, char *destOp);

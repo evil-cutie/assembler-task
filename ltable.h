@@ -7,12 +7,12 @@ typedef struct labelLS
 {
     char *label;
     int address;                   /* in decimal */
-    short type;                    /* data = 0, code = 1, extern = 3 */
+    short type;                    /* data = 0, code = 1, extern = 2, entry = 3 */
     labelPT next;
 }labelLS;
 
 /******************************************* functions *******************************************/
-labelPT findLabel(labelPT head, char *name);
+labelPT *findLabel(labelPT *head, char *name);
 void addLabel(labelPT *head, char *label, int address, short type);
 void printLabelList(labelPT head);
 void freeLabelList(labelPT *head);

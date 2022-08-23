@@ -3,7 +3,6 @@
 void addLabel(labelPT *head, char *label, int address, short type)
 {
 	labelPT new = (labelPT)malloc(sizeof(labelLS));
-	labelPT temp = (*head); 
 	
 	if(!new)
 		printf("\nError: Cannot build label list\n");
@@ -13,25 +12,30 @@ void addLabel(labelPT *head, char *label, int address, short type)
     new->type = type;
 	new->next = NULL;
 	
-	if(head == NULL) 
+	if(!(*head)) 
 		(*head) = new;
 	
 	else
 	{
-		(*head) = new;
-		(*head)->next = temp;
+		labelPT *current = head;
+		while((*current)->next)
+			current = &(*current)->next;
+		
+		(*current)->next = new;
 	}
 }
 
-labelPT findLabel(labelPT head, char *name)
+labelPT *findLabel(labelPT *head, char *name)
 {
-	while(head)
+	labelPT *current = (labelPT*)malloc(sizeof(labelPT));
+	current = head;
+	while(*current)
 	{
-		if(!strcmp(name, head->label))
-			return head;
-		head = head->next;
+		if(!strcmp(name, (*current)->label))
+			return current;
+		current = &(*current)->next;
 	}
-	return head;
+	return NULL;
 }
 
 void printLabelList(labelPT head)
@@ -49,6 +53,8 @@ void printLabelList(labelPT head)
             printf("type: code\n");
 		if((head->type) == 2)
 			printf("type: extern\n"); 
+		if((head->type) == 3)
+			printf("type: entry\n"); 
 		head = head->next;
 	}
 	printf("\n**************** END LABEL TABLE ****************\n");
