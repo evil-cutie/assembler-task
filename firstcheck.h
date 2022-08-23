@@ -1,7 +1,7 @@
 #include "preprocessor.h"
 #include "ltable.h"
 #include "convert.h"
-#define ROWS 100
+#define ROWS 256
 #define DATA 0
 #define CODE 1
 #define EXTERN 2

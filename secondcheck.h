@@ -7,5 +7,4 @@ char *decodeLabel(char *label, labelPT *head, labelPT *externalHead, int lineCou
 void createExternFile(labelPT externalHead, char *fname);
 void createEntryFile(labelPT head, char *fname);
 void createObjectFile(char *fname, int IC, int DC);
-void printBinary();
 /*************************************************************************************************/

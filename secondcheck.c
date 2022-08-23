@@ -35,8 +35,7 @@ void secondcheck(char *fname, labelPT *head, labelPT *externalHead, int DC)
         createEntryFile(*head, fname);
         createObjectFile(fname, IC, DC);
     }
-    printBinary();
-    printLabelList(*externalHead);
+
     freeLabelList(head);
     freeLabelList(externalHead);
 }
@@ -220,6 +219,7 @@ void createObjectFile(char *fname, int IC, int DC)
     strcat(filename, ".ob");
     filePointer = fopen(filename, "w");
     
+    fputs("\t", filePointer);
     fputs(decimalTo32(IC), filePointer);
     fputs(" ", filePointer);
     fputs(decimalTo32(DC), filePointer);
@@ -248,19 +248,6 @@ void createObjectFile(char *fname, int IC, int DC)
     fclose(filePointer);
 }
 
-void printBinary()
-{
-    int i, j;
-    printf("\n***************** INSTRUCTIONS LIST *****************\n");
-    for(i = 0; strcmp(instructions[i], "\0"); i++)
-    {
-        printf("\naddress: %d\t\tcommand: %s", i+100, instructions[i]);
-    }
-    printf("\n***************** DATA LIST *****************\n");
-    for(j = 0; strcmp(data[j], "\0"); j++)
-    {
-        printf("\naddress: %d\t\tcommand: %s", j+i+100, data[j]);
-    }
-}
+
 
 
