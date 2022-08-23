@@ -1,4 +1,5 @@
 #include "convert.h"
+#include "tables.h"
 
 /* convert binary to base 32 */
 char *binaryTo32(char *binary)
@@ -26,12 +27,24 @@ char *binaryTo32(char *binary)
 /* convert decimal to base 32 */
 char *decimalTo32(int num)
 {
-	char *temp; 
-	char *base32 = (char*)malloc(sizeof(char)*2);
+	int quotient, i, end;
+	char temp;
+	char *base32 = (char*)malloc(sizeof(char)*3);
 	if(!base32)
 		printf("\nError: cannot allocate memory for %p",(void*)base32);
-	temp = decimalToBinary(num);
-	base32 = binaryTo32(temp);
+	for(i = 0; num; i++)
+	{
+		quotient = num%32;
+		num = num/32;
+		base32[i] = base32chars[quotient];
+	}
+	end = strlen(base32);
+	for(i = 0; i < end/2; i++)
+	{
+		temp = base32[end - i - 1];
+		base32[end - i - 1] = base32[i];
+		base32[i] = temp;
+	}
 	return base32;
 }
 /* convert decimal to binary */
@@ -44,7 +57,7 @@ char *decimalToBinary(int num)
 	memset(binaryNum, '0', BITS);	
 	for(i = 0; absnum > 0; i++)    
 	{    
-		binaryNum[i]= absnum % 2 + '0';    
+		binaryNum[i] = absnum % 2 + '0';    
 		absnum = absnum/2;    
 	} 
 	/* need to reverse binary number to get its true value */
@@ -121,49 +134,3 @@ char *twosComplement(char *num)
    complement[BITS] = '\0';
    return complement;
 }
-
-char *opcode(char *nextword)
-{
-	int i;
-	for(i = 0; i < COMMANDS; i++)
-	{
-		if(!strcmp(nextword, validCommands[i]))
-			return binaryOpcode[i];
-	}
-	return NULL;
-}
-
-char *operand(char *nextword)
-{
-	int i;
-	for(i = 0; i < COMMANDS; i++)
-	{
-		if(!strcmp(nextword, validRegisters[i])) /* register addressing */
-			return "11";
-		if(!strcmp(nextword, ".struct") || !strcmp(nextword, ".data") || !strcmp(nextword, ".string")) /* direct addressing */
-			return "01";
-		if(!strcmp(nextword, "#")) /* instant addressing */
-			return "00";
-	}
-	return NULL;
-}
-
-void decodeString(char *string)
-{
-	int value;
-	char *binary = (char*)malloc(sizeof(int)*BITS);
-	char *ptr = string;
-	while(ptr)
-	{
-		value = *ptr - '0'; /* ascii value of character */
-		binary = decimalToBinary(value);
-		addToTable(binary);
-		ptr++;
-	}
-}
-/* add binary code to table */
-void addToTable(char *binary)
-{
-	;
-}
-

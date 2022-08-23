@@ -1,16 +1,16 @@
-assembler:	preprocessor.o main.o tables.o	convert.o	symboltable.o	datatable.o	firstcheck.o
-	gcc	-g	-Wall	-ansi	-pedantic	preprocessor.o	main.o	tables.o	convert.o	datatable.o	symboltable.o	firstcheck.o	-o	assembler
-preprocessor.o: preprocessor.c preprocessor.h tables.h
+assembler:	preprocessor.o main.o tables.o	convert.o	firstcheck.o	ltable.o	secondcheck.o
+	gcc	-g	-Wall	-ansi	-pedantic	preprocessor.o	main.o	tables.o	convert.o	ltable.o	firstcheck.o	secondcheck.o	-o	assembler
+preprocessor.o: preprocessor.c preprocessor.h 
 	gcc	-c	-Wall	-ansi	-pedantic	preprocessor.c	-o	preprocessor.o
-main.o: main.c preprocessor.h
+main.o: main.c secondcheck.h
 	gcc	-c	-Wall	-ansi	-pedantic	main.c	-o	main.o
-tables.o: tables.c tables.h DataTable.h
+tables.o: tables.c tables.h 
 	gcc	-c	-Wall	-ansi	-pedantic	tables.c	-o	tables.o
-convert.o:	convert.c	convert.h	tables.h
+convert.o:	convert.c	convert.h	
 	gcc	-c	-Wall	-ansi	-pedantic	convert.c	-o	convert.o
-symboltable.o:	SymbolTable.c	SymbolTable.h 
-	gcc	-c	-Wall	-ansi	-pedantic	SymbolTable.c	-o	symboltable.o
-datatable.o:	DataTable.c	DataTable.h
-	gcc	-c	-Wall	-ansi	-pedantic	DataTable.c	-o	datatable.o
-firstcheck.o:	firstcheck.c	firstcheck.h	SymbolTable.h	DataTable.h
+firstcheck.o:	firstcheck.c	firstcheck.h	
 	gcc	-c	-Wall	-ansi	-pedantic	firstcheck.c	-o	firstcheck.o
+ltable.o: ltable.c	ltable.h
+	gcc	-c	-Wall	-ansi	-pedantic	ltable.c	-o	ltable.o
+secondcheck.o:	secondcheck.c	secondcheck.h
+	gcc	-c	-Wall	-ansi	-pedantic	secondcheck.c	-o	secondcheck.o

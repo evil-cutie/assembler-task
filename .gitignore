@@ -3,4 +3,7 @@
 *.am
 ./assembler
 *.o
+*.ent
+*.ext
+*.ob
 .vscode/

@@ -2,9 +2,9 @@
 #include "tables.h"
 
 /* read .as file and create .am file with macro expansion */
-FILE *readAndCreateFile(char *fname, macroPT *head)
+void readAndCreateFile(char *fname, macroPT *head)
 {
-	FILE *fpSource; /*pointer to a source file */
+	FILE *fpSource; /* pointer to a source file */
 	FILE *fpAm; /* pointer to ".am" file */
 	macroPT foundMacro = NULL;
 	char *firstWord, *name, *textptr, *value;
@@ -12,6 +12,9 @@ FILE *readAndCreateFile(char *fname, macroPT *head)
 	int i = 1;
 	value = name = textptr = firstWord = NULL;
 	newMacro = FALSE;
+	error = FALSE;
+	memset(fnameAm, '\0', MAX);
+	memset(fnameAs, '\0', MAX);
 	strcpy(fnameAm, fname);
 	strcpy(fnameAs, fname);
 	strncat(fnameAm, ".am", 3); /* filename.am */
@@ -30,7 +33,7 @@ FILE *readAndCreateFile(char *fname, macroPT *head)
 	
 	while(fgets(buffer, 100, fpSource))
 	{	
-		lineLength(buffer); /* check if line length is valid */
+		lineLength(buffer); 
 		sscanf(buffer, "%s", firstWord); /* scan a first word in a line */
 		foundMacro = findMacro(*head, firstWord);
 		if(foundMacro)
@@ -62,7 +65,7 @@ FILE *readAndCreateFile(char *fname, macroPT *head)
 			textptr = buffer;
 			textptr = textptr + strlen("macro"); /* move a pointer to the next word */
 			sscanf(textptr, "%s", name); /* scan next word */
-			if((isCommandName(name) > -1) || (isDirName(name) > -1) || (isRegisterName(name) > -1))
+			if(isReservedWord(name))
 			{
 				printf("\nError: macro name cannot be '%s'\n", name);
 				error = TRUE;
@@ -74,13 +77,11 @@ FILE *readAndCreateFile(char *fname, macroPT *head)
 	}
 	fclose(fpSource);
 	rewind(fpAm);
-	
 	if(error) 
 	{
 		remove(fnameAm);
-		printf("removed file\n");
+		printf("\nfile '%s' removed due to compilation error", fnameAm);
 	}
-	return fpAm;
 }
 /* add new macro to list */
 void addMacro(macroPT *head, char *name, char *string)

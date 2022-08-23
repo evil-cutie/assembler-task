@@ -1,25 +1,19 @@
-MAIN: mov S1.1 ,LENGTH
+; file ps.as
+
+.entry LOOP
+.entry LENGTH
+.extern BLA
+.extern W
+MAIN: mov S1.1 W
 add r2,STR
-LOOP: jmp END
-macro m1
-inc K
-mov S1.2 ,r3
-endmacro
+LOOP: jmp W r2
 prn #-5
 sub r1, r4
-m1
-bne LOOP
-macro bla
-this is bla macro
-endmacro
-END: 
-bla
+inc K
+mov S1.2, r3
+bne BLA
+END: hlt #4
 STR: .string "abcdef"
-macro m2
-this is m2 macro
-endmacro
 LENGTH: .data 6,-9,15
 K: .data 22
-bla
-m2
 S1: .struct 8, "ab"
