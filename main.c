@@ -14,6 +14,5 @@ int main(int argc, char *argv[])
 			DC = firstCheck(argv[i], &labelHead);
 		if(compilationError == FALSE)
 			secondcheck(argv[i], &labelHead, &externalHead, DC);
-		freeLabelList(&labelHead);
 	}
 }
