@@ -6,11 +6,11 @@ macro m1
 inc K
 mov S1.2 ,r3
 endmacro
-prn #-5
+prn #-3
 sub r1, r4
 m1
 END: hlt
-STR: .string "abcdef"
+STR: .string "abcdef
 LENGTH: .data 6,-9,15
-K: .data 22
-S1: .struct 8, "ab"
+K: .data 3.14
+S1: .struct 8.14, "ab"

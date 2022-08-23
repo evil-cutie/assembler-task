@@ -77,7 +77,7 @@ void checkLine(char **line, int *DC, int *IC, labelPT *head, int lineCount)
             else if(isCommandName(line[pos]))
             {
                 addToTable(newLabel, head, tempIC, CODE, lineCount); 
-                tempIC = decodeCommand(line, pos, tempIC); 
+                tempIC = decodeCommand(line, pos, tempIC, lineCount); 
             }
             else
             {
@@ -91,7 +91,7 @@ void checkLine(char **line, int *DC, int *IC, labelPT *head, int lineCount)
         if(searchEntryOrExtern(line, head, pos, lineCount))
             ;
         else if(isCommandName(line[pos]))
-            tempIC = decodeCommand(line, 0, tempIC); 
+            tempIC = decodeCommand(line, 0, tempIC, lineCount); 
         else
         {
             printf("\nError: '%s' is illigal command ==> line %d", line[pos], lineCount);
@@ -116,10 +116,10 @@ void addToTable(char *newLabel, labelPT *head, int value, int type, int lineCoun
 int defineNewData(char **line, labelPT *head, int DC, int lineCount, int pos)
 {
     if(!strcmp(line[pos], validDirectives[2]))            /* string definition */
-        DC = decodeString(line[pos + 1], DC);
+        DC = decodeString(line[pos + 1], DC, lineCount);
             
     if(!strcmp(line[pos], validDirectives[1]))            /* array definition */
-        DC = decodeData(line, DC);
+        DC = decodeData(line, DC, lineCount);
             
     if(!strcmp(line[pos], validDirectives[0]))            /* struct definition */
         DC = decodeStruct(line, DC, lineCount);
@@ -191,7 +191,7 @@ char *opcode(char *nextword)
 	return NULL;
 }
 /* returns binary code of a given operand */
-char *operand(char *nextword)
+char *operand(char *nextword) 
 {
 	int i;
 	for(i = 0; i < COMMANDS; i++)
@@ -219,33 +219,77 @@ char *registerBin(char *regist)
     return NULL;
 }
 
-int decodeString(char *string, int DC)
+char *isValidString(char *string, int lineCount)
 {
-	char *binary = (char*)malloc(sizeof(int)*BITS);
-	char *ptr = &string[1];
-	while(*ptr && *ptr != '"')
+    int i, start, end;
+    char *word = (char*)malloc(sizeof(char)*MAX);
+    start = 0;  
+    end = strlen(string) - 1;  
+     /* check if string starts with quote */                   
+    if (string[start] != '\"')                                    
+    {
+        printf("\nError: string does not start with \" ==> line %d", lineCount);
+        compilationError =  TRUE;
+        return NULL;
+    }
+    /* check if string ends with quote */
+    if(string[end] != '\"')                       
+    {
+        printf("\nError: string does not end with \" ==> line %d", lineCount);
+        compilationError =  TRUE;
+        return NULL;
+    }
+    /* copy a string with no quotes */
+    strncpy(word, &string[start+1], end - 1);     
+    
+    for(i = 0; word[i]; i++) 
+    {
+        if(!isprint(word[i]) || word[i] == '\"')
+        {
+            printf("\nError: illigal characters in string '%s' ==> line %d", word, lineCount);
+            compilationError =  TRUE;
+            return NULL;
+        }
+    } 
+    return word;
+}
+
+int decodeString(char *string, int DC, int lineCount)
+{
+	
+    char *binary = (char*)malloc(sizeof(int)*BITS);
+	char *word = isValidString(string, lineCount);
+
+    if(word == NULL)
+        return DC;
+    
+	while(*word)
 	{
-        binary = decimalToBinary(*ptr);
+        binary = decimalToBinary(*word);
         strcpy(data[DC], binary);
         DC++;
-        ptr++;
+        word++;
 	}
     strcpy(data[DC], "0000000000"); /* end of string */
     DC++;
+    
     return DC;
 }
 
-int decodeData(char **line, int DC)
+int decodeData(char **line, int DC, int lineCount)
 {
     int decimal;
-    int i = 2;
+    int pos = 2;
     char *binary = (char*)malloc(sizeof(int)*BITS);
-    while(line[i])
+    while(line[pos])
     {
-        decimal = atoi(line[i]);
-        binary = decimalToBinary(decimal); 
-        strcpy(data[DC], binary);
-        i++;
+        if(isValidNumber(line[pos], lineCount))
+        {
+            decimal = atoi(line[pos]);
+            binary = decimalToBinary(decimal); 
+            strcpy(data[DC], binary);
+        }
+        pos++;
         DC++;
     }
     return DC;
@@ -254,30 +298,33 @@ int decodeData(char **line, int DC)
 int decodeStruct(char **line, int DC, int lineCount)
 {
     int decimal;
-    char *binary = (char*)malloc(sizeof(int)*BITS);
-    int i = 2;
-    char num = *line[i];
-    if(isdigit(num))
+    char *binary = (char*)malloc(sizeof(char)*BITS);
+    int pos = 2;
+    char *num = line[pos];
+    if(isValidNumber(num, lineCount))
     {
-        decimal = atoi(line[i]);
+        decimal = atoi(line[pos]);
         binary = decimalToBinary(decimal);
         strcpy(data[DC], binary);
         DC++;
-        i++;
+        pos++;
     }
     else
+    {
         printf("\nError: invalid struct definition, first field must be integer ==> line %d", lineCount);
-    
-    DC = decodeString(line[i], DC);
+        DC = decodeString(line[pos+1], DC, lineCount);
+        return DC;
+    }
+    DC = decodeString(line[pos], DC, lineCount);
     return DC;
 }
 /* decode first line */
-int decodeCommand(char **line, int pos, int IC)
+int decodeCommand(char **line, int pos, int IC, int lineCount)
 {
-    char *destOp, *sourceOp, *tmp, *command;
+    char *destOp, *sourceOp, *tmpSource, *tmpDest, *command;
     char *binary = (char*)malloc(sizeof(char)*BITS);
     int L = 0;
-    tmp =  NULL;
+    tmpSource = tmpDest = NULL;
     command = line[pos];
     sourceOp = line[pos+1];
     destOp = line[pos+2];
@@ -290,27 +337,27 @@ int decodeCommand(char **line, int pos, int IC)
     /* bits 9-6 */
     strcpy(binary, opcode(command));
     /* bits 5-4 */
-    if(sourceOp && (tmp = operand(sourceOp)))
-        strcat(binary, tmp);
+    if(sourceOp && (tmpSource = operand(sourceOp)))
+        strcat(binary, tmpSource);
     else
         strcat(binary, "00");
     /* bits 3-2 */
-    if(destOp && (tmp = operand(destOp)))
-        strcat(binary, tmp);
+    if(destOp && (tmpDest = operand(destOp)))
+        strcat(binary, tmpDest);
     else
         strcat(binary, "00");   /* A, R, E */
     /* bits 1-0 */
     strcat(binary, "00");
     strcpy(instructions[IC], binary);
     IC++;
-    if(isLegalOperand(command, sourceOp, destOp))
+    if(isLegalOperand(command, tmpSource, tmpDest, lineCount))
     {
-        L = checkOperands(sourceOp, destOp, IC); 
+        L = checkOperands(sourceOp, destOp, IC, lineCount); 
     }
     return (IC + L);
 }
 
-int checkOperands(char *sourceOp, char *destOp, int IC)
+int checkOperands(char *sourceOp, char *destOp, int IC, int lineCount)
 {
     int L = 0;
     int diff = 0;
@@ -339,7 +386,7 @@ int checkOperands(char *sourceOp, char *destOp, int IC)
         {
             L++;
         }
-        if((diff = decodeNum(sourceOp, IC)))       /* source operand is a digit */
+        if((diff = decodeNum(sourceOp, IC, lineCount)))       /* source operand is a digit */
             L = L + diff;
         if((diff = decodeStructAccess(sourceOp, IC)))
             L = L + diff;
@@ -358,7 +405,7 @@ int checkOperands(char *sourceOp, char *destOp, int IC)
         {
             return (L+1);
         }
-        if((diff = decodeNum(destOp, IC+L)))      /* destination operand is a digit */
+        if((diff = decodeNum(destOp, IC+L, lineCount)))      /* destination operand is a digit */
             L = L + diff;
         if((diff = decodeStructAccess(destOp, IC+L)))
             L = L + diff;
@@ -385,7 +432,25 @@ int decodeStructAccess(char *op, int IC)
     return L;
 }
 
-int decodeNum(char *op, int IC)
+int isValidNumber(char *num, int lineCount)
+{
+    int i = 0;
+    if(num[0] == '-' || num[0] == '+')
+        i++;
+    while(num[i])
+    {
+        if(!isdigit(num[i]))
+        {
+            printf("\nError: '%s' is invalid number ==> line %d", num, lineCount);
+            compilationError = TRUE;
+            return 0;
+        }
+        i++;
+    }
+    return 1;
+}
+
+int decodeNum(char *op, int IC, int lineCount)
 {
     int L = 0;
     char *binary = (char*)malloc(sizeof(char)*BITS);
@@ -395,12 +460,15 @@ int decodeNum(char *op, int IC)
         char *temp = (char*)malloc(sizeof(op));
         char *binaryNum = (char*)malloc(sizeof(char)*BITS);
         strcpy(temp, &op[1]);
-        num = atoi(temp);
-        binaryNum = decimalToBinary(num);
-        strcpy(binary, &binaryNum[2]);
-        strcat(binary, "00");
-        strcpy(instructions[IC], binary);
-        return (L+1);
+        if(isValidNumber(temp, lineCount))
+        {
+            num = atoi(temp);
+            binaryNum = decimalToBinary(num);
+            strcpy(binary, &binaryNum[2]);
+            strcat(binary, "00");
+            strcpy(instructions[IC], binary);
+            return (L+1);
+        }
     }
     return L;
 } 
@@ -416,8 +484,42 @@ void updateDataAddress(int IC, labelPT *head)
     } 
 }
 
-int isLegalOperand(char *command, char *sourceOp, char *destOp)
+int isLegalOperand(char *command, char *sourceOp, char *destOp, int lineCount)
 {
+    int row, col, sourceError, destError;
+    row = 0;
+    sourceError = destError = 1;
+    /* get decimal value of opcode */
+    while(strcmp(command, validCommands[row]))
+        row++;
+    /* check destination operand */
+    col = 0;
+    if(destOp == NULL && legalDestOperands[row][col] == NULL)
+        destError = 0;
+    for(col = 0; legalDestOperands[row][col] != NULL; col++)
+    {
+        if(!strcmp(destOp, legalDestOperands[row][col]))
+            destError = 0;
+    }
+    if(destError)
+        printf("\nError: illigal destination operand ==> line %d", lineCount);
+    /* check source operand */
+    col = 0;
+    if(sourceOp == NULL && legalSourceOperands[row][col] == NULL)
+        sourceError = 0;
+    for(col = 0; legalSourceOperands[row][col] != NULL; col++)
+    {
+        if(!strcmp(sourceOp, legalSourceOperands[row][col]))
+            sourceError = 0;
+    }
+    if(sourceError)
+        printf("\nError: illigal source operand ==> line %d", lineCount);
+    
+    if(destError || sourceError)
+    {
+        compilationError = TRUE;
+        return 0;
+    }
     return 1;
 }
 

@@ -134,6 +134,3 @@ char *twosComplement(char *num)
    complement[BITS] = '\0';
    return complement;
 }
-
-
-

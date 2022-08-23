@@ -1,5 +1,7 @@
 #include "firstcheck.h"
 
+enum boolean entryFlag;
+
 /******************************************* functions *******************************************/
 void secondcheck(char *fname, labelPT *head, labelPT *externalHead, int DC);
 int secondCheckLine(char **line, int IC, labelPT *head, labelPT *externalHead, int lineCount);

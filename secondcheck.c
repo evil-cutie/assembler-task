@@ -11,8 +11,9 @@ void secondcheck(char *fname, labelPT *head, labelPT *externalHead, int DC)
     char **nextword;
     int IC = 0;
     int lineCount = 1;
-
     compilationError = FALSE;
+    entryFlag = FALSE;
+
     memset(fileName, '\0', MAX);
     strcpy(fileName, fname);
     strncat(fileName, ".am", 3);
@@ -55,6 +56,7 @@ int secondCheckLine(char **line, int IC, labelPT *head, labelPT *externalHead, i
     /* new entry found */
     if(!strcmp(line[pos], ".entry"))
     {
+        entryFlag = TRUE;
         if((current = findLabel(head, line[pos+1])))
         {
             if((*current)->type != EXTERN)
@@ -159,6 +161,10 @@ void createExternFile(labelPT externalHead, char *fname)
     char filename[MAX];
     char *address32 = (char*)malloc(sizeof(char)*BITS);
     int decimalAddress = 0;
+    /* when no externals found .ext file is not created */
+    if(!externalHead)
+        return ;
+    
     memset(filename, '\n', MAX);
     strcpy(filename, fname);
     strcat(filename, ".ext");
@@ -185,6 +191,10 @@ void createEntryFile(labelPT head, char *fname)
     char filename[MAX];
     char *address32 = (char*)malloc(sizeof(char)*BITS);
     int decimalAddress = 0;
+    /* when no entries found .ent file is not created */
+    if(entryFlag == FALSE)
+        return ;
+
     memset(filename, '\n', MAX);
     strcpy(filename, fname);
     strcat(filename, ".ent");
@@ -247,7 +257,3 @@ void createObjectFile(char *fname, int IC, int DC)
     }
     fclose(filePointer);
 }
-
-
-
-
